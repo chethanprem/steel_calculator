@@ -43,9 +43,32 @@ jobs:
             mkdir -p "$dest"
             cp "android-config/res/mipmap-${density}/ic_launcher.png"       "$dest/ic_launcher.png"
             cp "android-config/res/mipmap-${density}/ic_launcher_round.png" "$dest/ic_launcher_round.png"
-            echo "✓ Copied ${density} icons"
+            cp "android-config/res/mipmap-${density}/ic_launcher.png"       "$dest/ic_launcher_foreground.png"
+            echo "✓ Copied ${density}"
           done
-          
+
+          # Overwrite adaptive icon XMLs to use our PNG directly
+          mkdir -p android/app/src/main/res/mipmap-anydpi-v26
+          cat > android/app/src/main/res/mipmap-anydpi-v26/ic_launcher.xml << 'EOF'
+          <?xml version="1.0" encoding="utf-8"?>
+          <adaptive-icon xmlns:android="http://schemas.android.com/apk/res/android">
+              <background android:drawable="@mipmap/ic_launcher_background"/>
+              <foreground android:drawable="@mipmap/ic_launcher_foreground"/>
+          </adaptive-icon>
+          EOF
+
+          cp android/app/src/main/res/mipmap-anydpi-v26/ic_launcher.xml \
+             android/app/src/main/res/mipmap-anydpi-v26/ic_launcher_round.xml
+
+          # Replace background with solid dark color matching icon
+          mkdir -p android/app/src/main/res/values
+          cat > android/app/src/main/res/values/ic_launcher_background.xml << 'EOF'
+          <?xml version="1.0" encoding="utf-8"?>
+          <resources>
+              <color name="ic_launcher_background">#FF0D0D0D</color>
+          </resources>
+          EOF
+          echo "✓ Adaptive icon overridden"
       - name: Make gradlew executable
         run: chmod +x android/gradlew
 
