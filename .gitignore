@@ -1,0 +1,14 @@
+node_modules/
+dist/
+
+# Android — keep the project but ignore build outputs
+android/app/build/
+android/.gradle/
+android/local.properties
+
+# iOS (not used)
+ios/
+
+# Environment
+.env
+.env.local
