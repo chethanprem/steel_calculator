@@ -26,7 +26,7 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: '20'
-          
+
       - name: Install dependencies
         run: npm install
 
@@ -35,24 +35,28 @@ jobs:
 
       - name: Sync Capacitor
         run: npx cap sync android
-        
+
       - name: Apply custom app icons
         run: |
           for density in mdpi hdpi xhdpi xxhdpi xxxhdpi; do
+            src="android-config/res/mipmap-${density}"
             dest="android/app/src/main/res/mipmap-${density}"
+
             mkdir -p "$dest"
-            cp "android-config/res/mipmap-${density}/ic_launcher.png"       "$dest/ic_launcher.png"
-            cp "android-config/res/mipmap-${density}/ic_launcher_round.png" "$dest/ic_launcher_round.png"
-            cp "android-config/res/mipmap-${density}/ic_launcher.png"       "$dest/ic_launcher_foreground.png"
+
+            cp "$src/ic_launcher.png" "$dest/ic_launcher.png"
+            cp "$src/ic_launcher_round.png" "$dest/ic_launcher_round.png"
+            cp "$src/ic_launcher.png" "$dest/ic_launcher_foreground.png"
+
             echo "✓ Copied ${density}"
           done
 
-          # Overwrite adaptive icon XMLs to use our PNG directly
           mkdir -p android/app/src/main/res/mipmap-anydpi-v26
+
           cat > android/app/src/main/res/mipmap-anydpi-v26/ic_launcher.xml << 'EOF'
           <?xml version="1.0" encoding="utf-8"?>
           <adaptive-icon xmlns:android="http://schemas.android.com/apk/res/android">
-              <background android:drawable="@mipmap/ic_launcher_background"/>
+              <background android:drawable="@android:color/black"/>
               <foreground android:drawable="@mipmap/ic_launcher_foreground"/>
           </adaptive-icon>
           EOF
@@ -60,15 +64,8 @@ jobs:
           cp android/app/src/main/res/mipmap-anydpi-v26/ic_launcher.xml \
              android/app/src/main/res/mipmap-anydpi-v26/ic_launcher_round.xml
 
-          # Replace background with solid dark color matching icon
-          mkdir -p android/app/src/main/res/values
-          cat > android/app/src/main/res/values/ic_launcher_background.xml << 'EOF'
-          <?xml version="1.0" encoding="utf-8"?>
-          <resources>
-              <color name="ic_launcher_background">#FF0D0D0D</color>
-          </resources>
-          EOF
-          echo "✓ Adaptive icon overridden"
+          echo "✓ Adaptive icon configured"
+
       - name: Make gradlew executable
         run: chmod +x android/gradlew
 
@@ -89,12 +86,9 @@ jobs:
         uses: softprops/action-gh-release@v2
         with:
           tag_name: build-${{ github.run_number }}
-          name: Steel Calc v1.0 — Build ${{ github.run_number }}
+          name: Steel Weight Calculator - Build ${{ github.run_number }}
           body: |
             Auto-built APK from commit ${{ github.sha }}
-            Install app-debug.apk on Android (enable unknown sources first)
           files: android/app/build/outputs/apk/debug/app-debug.apk
-          draft: false
-          prerelease: false
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
