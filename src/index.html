@@ -2,1023 +2,1918 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no">
-<meta name="mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<title>Steel Weight Calculator</title>
-<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;600;700;800&family=Barlow:wght@300;400;500;600&display=swap" rel="stylesheet">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Steel Weight Calculator V7</title>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;600;700;800;900&family=Barlow:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <style>
-  :root {
-    --bg: #0f1117;
-    --surface: #1a1d27;
-    --card: #21253a;
-    --border: #2e3350;
-    --accent: #f5a623;
-    --accent2: #e8562a;
-    --text: #e8eaf0;
-    --muted: #7a809a;
-    --green: #3ecf8e;
-    --input-bg: #13151f;
-    --safe-top: env(safe-area-inset-top, 0px);
-    --safe-bottom: env(safe-area-inset-bottom, 0px);
-  }
-  * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+:root {
+  --bg: #0d0f14;
+  --surface: #141720;
+  --card: #1a1e2a;
+  --card2: #1f2333;
+  --border: #252a3a;
+  --border2: #2e3450;
+  --accent: #f5a623;
+  --accent-dim: rgba(245,166,35,0.12);
+  --accent2: #e8562a;
+  --text: #eef0f6;
+  --muted: #6b718a;
+  --muted2: #9098b5;
+  --green: #3ecf8e;
+  --green-bg: rgba(62,207,142,0.08);
+  --green-border: rgba(62,207,142,0.2);
+  --input-bg: #0f1118;
+  --tab-h: 72px;
+  --bottom-bar: 70px;
+  --safe-bottom: env(safe-area-inset-bottom, 0px);
+}
+* { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+html, body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'Barlow', sans-serif;
+  height: 100%;
+  overflow: hidden;
+}
 
-  html, body {
-    height: 100%;
-    overflow: hidden; /* prevent body scroll — only inner panels scroll */
-  }
+/* ── APP SHELL ── */
+.app {
+  display: flex;
+  flex-direction: column;
+  height: 100dvh;
+  height: 100vh;
+  max-width: 480px;
+  margin: 0 auto;
+  position: relative;
+  overflow: hidden;
+}
 
-  body {
-    background: var(--bg);
-    background-image: radial-gradient(circle, rgba(46,51,80,0.55) 1px, transparent 1px);
-    background-size: 22px 22px;
-    color: var(--text);
-    font-family: 'Barlow', sans-serif;
-    display: flex;
-    flex-direction: column;
-    /* Push content up when keyboard opens — body shrinks on Android */
-  }
+/* ── HEADER ── */
+.header {
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  padding: 14px 16px 12px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-shrink: 0;
+  position: relative;
+  z-index: 10;
+}
+.logo-hex {
+  width: 42px; height: 42px;
+  background: var(--accent);
+  clip-path: polygon(50% 0%,100% 25%,100% 75%,50% 100%,0% 75%,0% 25%);
+  display: flex; align-items: center; justify-content: center;
+  font-family: 'Barlow Condensed', sans-serif;
+  font-weight: 900; font-size: 20px; color: #000;
+  flex-shrink: 0;
+}
+.header-title {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 22px; font-weight: 900;
+  letter-spacing: 2px; text-transform: uppercase;
+  color: #fff;
+}
+.header-title span { color: var(--accent); }
+.header-badge {
+  margin-left: auto;
+  background: var(--card2);
+  border: 1px solid var(--border2);
+  border-radius: 6px;
+  padding: 4px 10px;
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 13px; font-weight: 700;
+  letter-spacing: 1px; color: var(--muted2);
+}
 
-  /* ── HEADER ── */
-  header {
-    background: var(--surface);
-    border-bottom: 2px solid var(--accent);
-    padding: 10px 16px;
-    padding-top: calc(10px + var(--safe-top));
-    display: flex; align-items: center; gap: 10px;
-    flex-shrink: 0;
-    position: relative;
-  }
-  header::after {
-    content: '';
-    position: absolute; bottom: -1px; left: 0; right: 0; height: 1px;
-    background: linear-gradient(90deg, var(--accent) 0%, transparent 60%);
-  }
-  .logo-icon {
-    width: 34px; height: 34px; flex-shrink: 0;
-    background: var(--accent);
-    clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
-    display: flex; align-items: center; justify-content: center;
-    font-family: 'Barlow Condensed', sans-serif;
-    font-weight: 800; font-size: 16px; color: #000;
-  }
-  header h1 {
-    font-family: 'Barlow Condensed', sans-serif;
-    font-size: 20px; font-weight: 800;
-    letter-spacing: 1.5px; text-transform: uppercase;
-    color: var(--text);
-  }
-  header h1 span { color: var(--accent); }
-  .header-version {
-    margin-left: auto;
-    background: var(--border); color: var(--muted);
-    font-family: 'Barlow Condensed', sans-serif;
-    font-size: 10px; font-weight: 700; letter-spacing: 1px;
-    padding: 3px 7px; border-radius: 4px; text-transform: uppercase;
-    flex-shrink: 0;
-  }
+/* ── TABS ── */
+.tabs-outer {
+  background: var(--surface);
+  border-bottom: 2px solid var(--border);
+  flex-shrink: 0;
+  position: relative;
+  z-index: 9;
+}
+.tabs-scroll {
+  display: flex;
+  overflow-x: auto;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+  padding: 0 4px;
+}
+.tabs-scroll::-webkit-scrollbar { display: none; }
+.tab-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding: 10px 14px 10px;
+  border: none;
+  background: none;
+  cursor: pointer;
+  white-space: nowrap;
+  border-bottom: 3px solid transparent;
+  flex-shrink: 0;
+  transition: all 0.18s;
+  position: relative;
+  top: 2px;
+}
+.tab-btn svg {
+  color: var(--muted);
+  transition: color 0.18s;
+}
+.tab-label {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 11px; font-weight: 700;
+  letter-spacing: 1px; text-transform: uppercase;
+  color: var(--muted);
+  transition: color 0.18s;
+}
+.tab-btn.active svg { color: var(--accent); }
+.tab-btn.active .tab-label { color: var(--accent); }
+.tab-btn.active { border-bottom-color: var(--accent); }
 
-  /* ── TABS ── */
-  .tabs-wrap {
-    background: var(--surface);
-    border-bottom: 1px solid var(--border);
-    padding: 0 4px;
-    display: flex; gap: 0;
-    overflow-x: auto;
-    flex-shrink: 0;
-    -webkit-overflow-scrolling: touch;
-    scrollbar-width: none;
-  }
-  .tabs-wrap::-webkit-scrollbar { display: none; }
-  .tab-btn {
-    font-family: 'Barlow Condensed', sans-serif;
-    font-size: 11px; font-weight: 700;
-    letter-spacing: 0.5px; text-transform: uppercase;
-    padding: 10px 10px;
-    background: none; border: none;
-    color: var(--muted); cursor: pointer;
-    border-bottom: 3px solid transparent;
-    transition: all 0.2s; white-space: nowrap;
-    touch-action: manipulation;
-  }
-  .tab-btn.active { color: var(--accent); border-bottom-color: var(--accent); }
+/* ── SCROLL AREA ── */
+.scroll-area {
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+  -webkit-overflow-scrolling: touch;
+  padding: 14px 12px calc(var(--bottom-bar) + 16px + var(--safe-bottom));
+  scrollbar-width: none;
+}
+.scroll-area::-webkit-scrollbar { display: none; }
 
-  /* ── SCROLL AREA — this is the only thing that scrolls ── */
-  .scroll-area {
-    flex: 1;
-    overflow-y: auto;
-    -webkit-overflow-scrolling: touch;
-    padding: 12px 12px 120px; /* bottom pad for FAB + safe area */
-    padding-bottom: calc(120px + var(--safe-bottom));
-  }
+/* ── CALC PANELS ── */
+.calc-panel { display: none; }
+.calc-panel.active { display: block; }
 
-  /* ── CALC PANELS ── */
-  .calc-panel { display: none; }
-  .calc-panel.active { display: block; }
+/* ── CALC CARD ── */
+.calc-card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  overflow: hidden;
+  margin-bottom: 12px;
+}
+.calc-card-header {
+  padding: 14px 16px 12px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  border-bottom: 1px solid var(--border);
+}
+.sec-badge {
+  background: var(--accent);
+  color: #000;
+  font-family: 'Barlow Condensed', sans-serif;
+  font-weight: 900; font-size: 13px;
+  width: 32px; height: 32px;
+  border-radius: 8px;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+}
+.calc-card-title {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 18px; font-weight: 800;
+  letter-spacing: 0.5px; color: var(--text);
+}
+.calc-body { padding: 14px 14px 10px; }
 
-  .calc-card {
-    background: var(--card);
-    border: 1px solid var(--border);
-    border-radius: 12px; overflow: hidden;
-    box-shadow: 0 4px 24px rgba(0,0,0,0.3);
-  }
-  .calc-header {
-    background: linear-gradient(135deg, var(--surface) 0%, #252940 100%);
-    padding: 14px 16px;
-    border-bottom: 1px solid var(--border);
-    display: flex; align-items: center; gap: 10px; flex-wrap: wrap;
-  }
-  .calc-badge {
-    background: var(--accent);
-    color: #000; font-family: 'Barlow Condensed', sans-serif;
-    font-weight: 800; font-size: 10px; letter-spacing: 1px;
-    padding: 2px 7px; border-radius: 4px; text-transform: uppercase;
-    flex-shrink: 0;
-  }
-  .calc-title {
-    font-family: 'Barlow Condensed', sans-serif;
-    font-size: 17px; font-weight: 700; letter-spacing: 0.5px;
-  }
-  .calc-body { padding: 16px; }
+/* ── FIELD GRID ── */
+.field-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin-bottom: 12px;
+}
+.field-grid.single { grid-template-columns: 1fr; }
+.field-grid.three { grid-template-columns: 1fr 1fr 1fr; }
+.field { display: flex; flex-direction: column; gap: 5px; }
+.field label {
+  font-size: 10px; font-weight: 700;
+  letter-spacing: 1.5px; text-transform: uppercase;
+  color: var(--muted);
+}
+.field input, .field select {
+  background: var(--input-bg);
+  border: 1.5px solid var(--border2);
+  border-radius: 10px;
+  color: var(--text);
+  font-family: 'Barlow', sans-serif;
+  font-size: 15px; font-weight: 500;
+  padding: 11px 13px;
+  outline: none;
+  transition: border-color 0.15s;
+  width: 100%;
+  -webkit-appearance: none;
+  appearance: none;
+}
+.field input::placeholder { color: var(--muted); font-size: 14px; }
+.field input:focus, .field select:focus {
+  border-color: var(--accent);
+}
+.field select {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%236b718a' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 10px center;
+  background-size: 16px;
+  padding-right: 32px;
+  cursor: pointer;
+}
+.field select option { background: #1a1e2a; }
 
-  /* ── FIELDS: 2 column on phone ── */
-  .field-grid {
-    display: grid; gap: 12px;
-    grid-template-columns: 1fr 1fr;
-  }
-  .field-grid.cols-1 { grid-template-columns: 1fr; }
-  .field-grid.cols-3 { grid-template-columns: 1fr 1fr 1fr; }
+/* ── FORMULA HINT ── */
+.formula-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--input-bg);
+  border-left: 3px solid var(--accent);
+  border-radius: 0 8px 8px 0;
+  padding: 9px 12px;
+  margin-bottom: 12px;
+}
+.formula-row svg { flex-shrink: 0; color: var(--accent); opacity: 0.7; }
+.formula-text {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 12px; color: var(--muted2);
+  letter-spacing: 0.3px;
+}
 
-  .field { display: flex; flex-direction: column; gap: 5px; }
-  .field label {
-    font-size: 10px; font-weight: 600;
-    letter-spacing: 1.2px; text-transform: uppercase;
-    color: var(--muted);
-  }
-  /* CRITICAL: readonly=false inputs trigger native keyboard. 
-     font-size must be ≥16px to prevent iOS auto-zoom */
-  .field input, .field select {
-    background: var(--input-bg);
-    border: 1px solid var(--border);
-    border-radius: 8px; color: var(--text);
-    font-family: 'Barlow', sans-serif;
-    font-size: 16px; font-weight: 500;
-    padding: 11px 13px;
-    outline: none; transition: border-color 0.2s;
-    width: 100%;
-    -webkit-appearance: none;
-    appearance: none;
-  }
-  .field input:focus, .field select:focus {
-    border-color: var(--accent);
-    box-shadow: 0 0 0 2px rgba(245,166,35,0.15);
-  }
-  .field select { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%237a809a' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 12px center; padding-right: 32px; }
-  .field select option { background: #1a1d27; }
+/* ── WT/MTR INFO ── */
+.wt-info {
+  display: none;
+  align-items: center;
+  gap: 8px;
+  background: var(--accent-dim);
+  border: 1px solid rgba(245,166,35,0.2);
+  border-radius: 8px;
+  padding: 7px 12px;
+  margin-bottom: 10px;
+}
+.wt-info.show { display: flex; }
+.wt-info-label { font-size: 10px; color: var(--muted); text-transform: uppercase; letter-spacing: 1px; }
+.wt-info-value { font-family: 'Barlow Condensed', sans-serif; font-size: 18px; font-weight: 800; color: var(--accent); }
+.wt-info-unit { font-size: 11px; color: var(--muted); }
 
-  .formula-hint {
-    margin: 12px 0 0;
-    background: var(--input-bg);
-    border-left: 3px solid var(--accent);
-    border-radius: 0 6px 6px 0;
-    padding: 8px 12px;
-    font-size: 11px; color: var(--muted);
-    font-family: 'Barlow Condensed', sans-serif;
-    letter-spacing: 0.3px; line-height: 1.5;
-  }
+/* ── RESULT DISPLAY ── */
+.result-display {
+  background: var(--green-bg);
+  border: 1.5px solid var(--green-border);
+  border-radius: 12px;
+  padding: 14px 16px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12px;
+}
+.result-label {
+  font-size: 11px; font-weight: 700;
+  letter-spacing: 2px; text-transform: uppercase;
+  color: var(--green); opacity: 0.75;
+  margin-bottom: 2px;
+}
+.result-value {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 44px; font-weight: 900;
+  color: var(--green); line-height: 1;
+}
+.result-unit {
+  font-size: 18px; font-weight: 400;
+  opacity: 0.6; margin-left: 5px;
+}
+.copy-btn {
+  background: var(--green-bg);
+  border: 1.5px solid var(--green-border);
+  border-radius: 10px;
+  color: var(--green);
+  cursor: pointer;
+  padding: 12px;
+  display: flex; align-items: center; justify-content: center;
+  transition: all 0.15s;
+  flex-shrink: 0;
+}
+.copy-btn:active { background: rgba(62,207,142,0.25); transform: scale(0.94); }
 
-  /* ── RESULT ── */
-  .result-display {
-    margin-top: 16px;
-    background: linear-gradient(135deg, #1a2f1a 0%, #0f1f0f 100%);
-    border: 1px solid #2a4a2a; border-radius: 10px;
-    padding: 14px 16px;
-    display: flex; align-items: center; justify-content: space-between;
-    gap: 10px;
-  }
-  .result-label {
-    font-family: 'Barlow Condensed', sans-serif;
-    font-size: 10px; font-weight: 700; letter-spacing: 2px;
-    text-transform: uppercase; color: var(--green); opacity: 0.7;
-    margin-bottom: 3px;
-  }
-  .result-value {
-    font-family: 'Barlow Condensed', sans-serif;
-    font-size: 36px; font-weight: 800; color: var(--green);
-    line-height: 1; transition: opacity 0.15s;
-  }
-  .result-unit { font-size: 14px; font-weight: 400; opacity: 0.6; margin-left: 3px; }
-  .copy-btn {
-    background: rgba(62,207,142,0.1);
-    border: 1px solid rgba(62,207,142,0.2);
-    border-radius: 8px; color: var(--green);
-    cursor: pointer; padding: 10px 12px;
-    display: flex; align-items: center; justify-content: center;
-    transition: all 0.2s; flex-shrink: 0;
-    touch-action: manipulation; min-width: 44px; min-height: 44px;
-  }
-  .copy-btn:active { background: rgba(62,207,142,0.3); }
+/* ── BUTTON ROW ── */
+.btn-row {
+  display: flex;
+  gap: 10px;
+  padding-bottom: 2px;
+}
+.add-btn {
+  flex: 1;
+  background: var(--accent);
+  color: #000;
+  border: none;
+  border-radius: 12px;
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 15px; font-weight: 900;
+  letter-spacing: 2px; text-transform: uppercase;
+  padding: 14px;
+  cursor: pointer;
+  transition: opacity 0.15s, transform 0.1s;
+}
+.add-btn:active { opacity: 0.8; transform: scale(0.97); }
+.clear-btn {
+  background: var(--card2);
+  border: 1.5px solid var(--border2);
+  border-radius: 12px;
+  color: var(--muted2);
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 13px; font-weight: 700;
+  letter-spacing: 1px; text-transform: uppercase;
+  padding: 14px 16px;
+  cursor: pointer;
+  display: flex; align-items: center; gap: 6px;
+  transition: all 0.15s;
+}
+.clear-btn:active { border-color: var(--accent2); color: var(--accent2); }
 
-  /* ── BUTTONS ── */
-  .btn-row { display: flex; gap: 10px; margin-top: 14px; }
-  .add-btn {
-    flex: 1;
-    background: var(--accent); color: #000;
-    border: none; border-radius: 10px;
-    font-family: 'Barlow Condensed', sans-serif;
-    font-size: 15px; font-weight: 800;
-    letter-spacing: 1px; text-transform: uppercase;
-    padding: 13px; cursor: pointer; touch-action: manipulation;
-    min-height: 48px;
-  }
-  .add-btn:active { opacity: 0.8; }
-  .clear-btn {
-    background: var(--input-bg);
-    border: 1px solid var(--border);
-    border-radius: 10px; color: var(--muted);
-    font-family: 'Barlow Condensed', sans-serif;
-    font-size: 13px; font-weight: 700;
-    letter-spacing: 0.5px; text-transform: uppercase;
-    padding: 13px 16px; cursor: pointer;
-    touch-action: manipulation; min-height: 48px;
-  }
-  .clear-btn:active { color: var(--accent2); border-color: var(--accent2); }
+/* ── RECENT ITEMS ── */
+.recent-card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  overflow: hidden;
+}
+.recent-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 16px 10px;
+  border-bottom: 1px solid var(--border);
+}
+.recent-title {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 13px; font-weight: 800;
+  letter-spacing: 2px; text-transform: uppercase;
+  color: var(--muted2);
+}
+.view-all-btn {
+  background: none; border: none;
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 13px; font-weight: 700;
+  letter-spacing: 1px; text-transform: uppercase;
+  color: var(--accent); cursor: pointer;
+}
+.recent-empty {
+  padding: 20px 16px;
+  text-align: center;
+  color: var(--muted);
+  font-size: 13px;
+}
+.recent-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 11px 14px;
+  border-bottom: 1px solid var(--border);
+  animation: slideIn 0.25s ease;
+}
+.recent-item:last-child { border-bottom: none; }
+@keyframes slideIn {
+  from { opacity: 0; transform: translateY(-6px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.item-num {
+  width: 28px; height: 28px;
+  background: var(--accent-dim);
+  border: 1px solid rgba(245,166,35,0.25);
+  border-radius: 7px;
+  display: flex; align-items: center; justify-content: center;
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 12px; font-weight: 800; color: var(--accent);
+  flex-shrink: 0;
+}
+.item-info { flex: 1; min-width: 0; }
+.item-name {
+  font-size: 13px; font-weight: 600; color: var(--text);
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.item-detail { font-size: 11px; color: var(--muted); margin-top: 1px; }
+.item-weight {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 15px; font-weight: 800; color: var(--green);
+  white-space: nowrap;
+}
+.item-weight .wt-unit { font-size: 11px; font-weight: 400; opacity: 0.65; }
+.item-menu-btn {
+  background: none; border: none; color: var(--muted);
+  cursor: pointer; padding: 4px; font-size: 16px; line-height: 1;
+}
+.item-menu-btn:active { color: var(--accent2); }
 
-  /* ── WT INFO ── */
-  .wt-info {
-    margin-top: 12px;
-    display: inline-flex; align-items: center; gap: 8px;
-    background: var(--input-bg); border-radius: 6px; padding: 7px 12px;
-    border: 1px solid var(--border);
-  }
-  .wt-info-label { font-size: 10px; color: var(--muted); text-transform: uppercase; letter-spacing: 1px; }
-  .wt-info-value { font-family: 'Barlow Condensed', sans-serif; font-size: 18px; font-weight: 700; color: var(--accent); }
-  .wt-info-unit { font-size: 11px; color: var(--muted); }
+/* ── HSS TYPE TOGGLE ── */
+.hss-toggle {
+  display: flex;
+  border: 1.5px solid var(--border2);
+  border-radius: 10px;
+  overflow: hidden;
+  margin-bottom: 12px;
+}
+.hss-toggle-btn {
+  flex: 1; border: none; background: transparent;
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 13px; font-weight: 800; letter-spacing: 1px;
+  color: var(--muted); padding: 9px 0; cursor: pointer;
+  transition: all 0.15s;
+}
+.hss-toggle-btn.active {
+  background: var(--accent); color: #000;
+}
+.pipe-sub-label {
+  font-size: 10px; color: var(--muted); text-transform: uppercase;
+  letter-spacing: 1.5px; margin-bottom: 8px;
+  font-family: 'Barlow Condensed', sans-serif; font-weight: 700;
+}
+.mode-toggle {
+  display: flex;
+  border: 1.5px solid var(--border2);
+  border-radius: 8px;
+  overflow: hidden;
+  width: fit-content;
+  margin-bottom: 10px;
+}
+.mode-btn {
+  border: none; background: transparent;
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 11px; font-weight: 800; letter-spacing: 1px;
+  color: var(--muted); padding: 6px 14px; cursor: pointer;
+  transition: all 0.15s;
+}
+.mode-btn.active { background: var(--accent); color: #000; }
 
-  /* ── PIPE MODE WRAP ── */
-  .pipe-mode-wrap {
-    display: flex; gap: 0;
-    border: 1px solid var(--border); border-radius: 6px; overflow: hidden;
-    width: 100%; margin-top: 8px;
-  }
-  .pipe-mode-wrap button {
-    flex: 1; padding: 8px 0;
-    background: transparent; color: var(--muted);
-    border: none;
-    font-family: 'Barlow Condensed', sans-serif;
-    font-weight: 700; font-size: 13px; letter-spacing: 1px;
-    cursor: pointer; touch-action: manipulation;
-  }
-  .pipe-mode-wrap button.active { background: var(--accent); color: #000; }
+/* ── BOTTOM BAR ── */
+.bottom-bar {
+  position: absolute;
+  bottom: 0; left: 0; right: 0;
+  background: var(--surface);
+  border-top: 1.5px solid var(--accent);
+  padding: 10px 16px calc(10px + var(--safe-bottom));
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  z-index: 20;
+}
+.bom-icon-wrap {
+  width: 40px; height: 40px;
+  background: var(--accent-dim);
+  border: 1px solid rgba(245,166,35,0.3);
+  border-radius: 10px;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+}
+.bom-bar-info { flex: 1; min-width: 0; }
+.bom-bar-label {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 14px; font-weight: 800;
+  color: var(--text); letter-spacing: 0.5px;
+}
+.bom-bar-sub { font-size: 11px; color: var(--muted); margin-top: 1px; }
+.bom-bar-chevron {
+  background: none; border: none; cursor: pointer;
+  color: var(--muted2); padding: 4px;
+}
+.bom-total-wrap { text-align: right; }
+.bom-total-label {
+  font-size: 10px; color: var(--muted); text-transform: uppercase;
+  letter-spacing: 1px; font-weight: 600;
+}
+.bom-total-val {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 22px; font-weight: 900; color: var(--green);
+  line-height: 1.1;
+}
 
-  /* ── TOAST ── */
-  .toast-container {
-    position: fixed; top: calc(12px + var(--safe-top)); right: 12px; left: 12px;
-    z-index: 9999;
-    display: flex; flex-direction: column; gap: 8px;
-    pointer-events: none;
-  }
-  .toast {
-    background: var(--card);
-    border: 1px solid var(--border);
-    border-radius: 10px;
-    padding: 11px 15px;
-    font-family: 'Barlow Condensed', sans-serif;
-    font-size: 14px; font-weight: 600; letter-spacing: 0.3px;
-    display: flex; align-items: center; gap: 8px;
-    box-shadow: 0 8px 32px rgba(0,0,0,0.5);
-    transform: translateY(-20px); opacity: 0;
-    transition: transform 0.3s cubic-bezier(.22,1,.36,1), opacity 0.3s;
-    pointer-events: auto;
-  }
-  .toast.show { transform: translateY(0); opacity: 1; }
-  .toast.success { border-left: 4px solid var(--green); }
-  .toast.error   { border-left: 4px solid var(--accent2); }
-  .toast.info    { border-left: 4px solid var(--accent); }
-  .toast-icon { font-size: 16px; flex-shrink: 0; }
+/* ── BOM SHEET ── */
+.bom-overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(0,0,0,0.7);
+  z-index: 30;
+  display: none;
+}
+.bom-overlay.open { display: block; }
+.bom-sheet {
+  position: absolute;
+  bottom: 0; left: 0; right: 0;
+  background: var(--card);
+  border-radius: 20px 20px 0 0;
+  border-top: 2px solid var(--accent);
+  max-height: 88%;
+  display: flex; flex-direction: column;
+  transform: translateY(100%);
+  transition: transform 0.3s cubic-bezier(.22,1,.36,1);
+  z-index: 31;
+}
+.bom-sheet.open { transform: translateY(0); }
+.sheet-handle {
+  width: 40px; height: 4px;
+  background: var(--border2);
+  border-radius: 2px;
+  margin: 12px auto 0;
+  flex-shrink: 0;
+}
+.sheet-header {
+  display: flex;
+  align-items: center;
+  padding: 12px 16px 12px;
+  border-bottom: 1px solid var(--border);
+  flex-shrink: 0;
+}
+.sheet-title {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 18px; font-weight: 900;
+  letter-spacing: 2px; text-transform: uppercase;
+}
+.sheet-count {
+  background: var(--accent2);
+  color: #fff;
+  border-radius: 20px;
+  padding: 2px 9px;
+  font-size: 12px; font-weight: 700;
+  margin-left: 10px;
+}
+.sheet-close {
+  margin-left: auto;
+  background: none; border: none;
+  color: var(--muted); font-size: 22px; cursor: pointer; line-height: 1;
+}
+.sheet-list {
+  flex: 1;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+}
+.sheet-list::-webkit-scrollbar { display: none; }
+.sheet-empty { padding: 40px 20px; text-align: center; color: var(--muted); font-size: 13px; }
+.sheet-item {
+  display: flex; align-items: flex-start;
+  gap: 12px; padding: 13px 16px;
+  border-bottom: 1px solid var(--border);
+  animation: slideIn 0.2s ease;
+}
+.sheet-item:last-child { border-bottom: none; }
+.sheet-item-num {
+  width: 28px; height: 28px;
+  background: var(--accent-dim);
+  border: 1px solid rgba(245,166,35,0.25);
+  border-radius: 7px;
+  display: flex; align-items: center; justify-content: center;
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 12px; font-weight: 800; color: var(--accent);
+  flex-shrink: 0; margin-top: 1px;
+}
+.sheet-item-info { flex: 1; min-width: 0; }
+.sheet-item-name { font-size: 13px; font-weight: 600; color: var(--text); }
+.sheet-item-detail { font-size: 11px; color: var(--muted); margin-top: 2px; line-height: 1.4; }
+.sheet-item-wt {
+  text-align: right;
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 16px; font-weight: 800; color: var(--green);
+  white-space: nowrap;
+}
+.sheet-item-wt .wu { font-size: 11px; font-weight: 400; opacity: 0.6; }
+.sheet-item-rm {
+  background: none; border: none; color: var(--muted);
+  cursor: pointer; font-size: 17px; padding: 0 0 0 6px; line-height: 1; margin-top: 2px;
+}
+.sheet-item-rm:active { color: var(--accent2); }
+.sheet-footer { flex-shrink: 0; }
+.sheet-total {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 16px;
+  border-top: 2px solid var(--border2);
+}
+.sheet-total-label {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 14px; font-weight: 700;
+  letter-spacing: 1px; text-transform: uppercase; color: var(--muted);
+}
+.sheet-total-val {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 30px; font-weight: 900; color: var(--accent);
+}
+.sheet-actions {
+  display: flex;
+  gap: 8px;
+  padding: 10px 14px calc(14px + var(--safe-bottom));
+}
+.sheet-btn {
+  flex: 1; border: none; border-radius: 10px;
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 13px; font-weight: 800; letter-spacing: 1px; text-transform: uppercase;
+  padding: 12px 10px; cursor: pointer;
+}
+.sheet-btn.s-clear { background: var(--input-bg); color: var(--muted); border: 1px solid var(--border2); }
+.sheet-btn.s-print { background: #1e2d4a; color: #6aa0e8; border: 1px solid #2a3d60; }
+.sheet-btn.s-export { background: var(--accent); color: #000; }
 
-  /* ── BOM FAB (always visible) ── */
-  .bom-fab {
-    position: fixed;
-    bottom: calc(16px + var(--safe-bottom));
-    right: 16px;
-    background: var(--accent); color: #000;
-    border: none; border-radius: 50px;
-    font-family: 'Barlow Condensed', sans-serif;
-    font-size: 14px; font-weight: 800; letter-spacing: 1px;
-    padding: 14px 20px; cursor: pointer;
-    box-shadow: 0 4px 20px rgba(245,166,35,0.5);
-    z-index: 100;
-    display: flex; align-items: center; gap: 8px;
-    touch-action: manipulation;
-    min-height: 50px;
-  }
-  .fab-badge {
-    background: #000; color: var(--accent);
-    border-radius: 50%; width: 22px; height: 22px;
-    display: inline-flex; align-items: center; justify-content: center;
-    font-size: 11px; font-weight: 800;
-  }
+/* ── CUSTOM NUMBER KEYBOARD ── */
+.kb-overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(0,0,0,0.5);
+  z-index: 50;
+  display: none;
+}
+.kb-overlay.open { display: block; }
+.kb-sheet {
+  position: absolute;
+  bottom: 0; left: 0; right: 0;
+  background: var(--surface);
+  border-radius: 20px 20px 0 0;
+  border-top: 2px solid var(--border2);
+  transform: translateY(100%);
+  transition: transform 0.28s cubic-bezier(.22,1,.36,1);
+  z-index: 51;
+  user-select: none;
+  -webkit-user-select: none;
+}
+.kb-sheet.open { transform: translateY(0); }
+.kb-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 16px 8px;
+  border-bottom: 1px solid var(--border);
+}
+.kb-field-label {
+  font-size: 11px; font-weight: 700;
+  letter-spacing: 1.5px; text-transform: uppercase;
+  color: var(--muted2);
+}
+.kb-value-display {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 28px; font-weight: 800;
+  color: var(--text);
+  letter-spacing: 1px;
+  min-width: 80px;
+  text-align: right;
+}
+.kb-value-display.empty { color: var(--muted); }
+.kb-done {
+  background: var(--accent);
+  color: #000;
+  border: none;
+  border-radius: 8px;
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 14px; font-weight: 900;
+  letter-spacing: 1px;
+  padding: 8px 18px;
+  cursor: pointer;
+}
+.kb-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1px;
+  background: var(--border);
+  border-top: 1px solid var(--border);
+}
+.kb-key {
+  background: var(--card);
+  border: none;
+  color: var(--text);
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 22px; font-weight: 700;
+  padding: 18px 10px;
+  cursor: pointer;
+  transition: background 0.1s;
+  display: flex; align-items: center; justify-content: center;
+}
+.kb-key:active { background: var(--card2); }
+.kb-key.zero { grid-column: span 1; }
+.kb-key.dot { color: var(--accent); }
+.kb-key.backspace { font-size: 18px; color: var(--muted2); }
+.kb-key.backspace:active { color: var(--accent2); }
+.kb-safe { height: var(--safe-bottom); background: var(--card); }
 
-  /* ── BOM DRAWER ── */
-  .bom-overlay {
-    display: none; position: fixed; inset: 0;
-    background: rgba(0,0,0,0.7); z-index: 200;
-    backdrop-filter: blur(2px);
-  }
-  .bom-overlay.open { display: block; }
-  .bom-drawer {
-    position: fixed; bottom: 0; left: 0; right: 0;
-    background: var(--card);
-    border-radius: 20px 20px 0 0;
-    border-top: 2px solid var(--accent);
-    max-height: 82vh;
-    display: flex; flex-direction: column;
-    z-index: 201;
-    transform: translateY(100%);
-    transition: transform 0.35s cubic-bezier(.22,1,.36,1);
-    padding-bottom: var(--safe-bottom);
-  }
-  .bom-drawer.open { transform: translateY(0); }
-  .bom-drawer-handle {
-    width: 40px; height: 4px;
-    background: var(--border); border-radius: 2px;
-    margin: 12px auto 0; flex-shrink: 0;
-  }
-  .bom-header {
-    background: var(--surface);
-    padding: 13px 18px;
-    border-bottom: 1px solid var(--border);
-    display: flex; align-items: center; gap: 10px;
-    flex-shrink: 0;
-  }
-  .bom-title {
-    font-family: 'Barlow Condensed', sans-serif;
-    font-size: 15px; font-weight: 800;
-    letter-spacing: 1.5px; text-transform: uppercase;
-  }
-  .bom-count {
-    background: var(--accent2); color: #fff;
-    border-radius: 20px; padding: 2px 9px;
-    font-size: 11px; font-weight: 700;
-  }
-  .bom-close {
-    margin-left: auto; background: none; border: none;
-    color: var(--muted); font-size: 20px; cursor: pointer;
-    min-width: 40px; min-height: 40px;
-    display: flex; align-items: center; justify-content: center;
-    touch-action: manipulation;
-  }
-  .bom-list {
-    flex: 1; overflow-y: auto;
-    -webkit-overflow-scrolling: touch;
-  }
-  .bom-item {
-    padding: 12px 18px;
-    border-bottom: 1px solid var(--border);
-    display: flex; justify-content: space-between; align-items: flex-start;
-  }
-  .bom-item-name { font-size: 13px; font-weight: 600; color: var(--text); line-height: 1.3; }
-  .bom-item-detail { font-size: 11px; color: var(--muted); margin-top: 2px; }
-  .bom-item-qty {
-    font-family: 'Barlow Condensed', sans-serif;
-    font-size: 17px; font-weight: 800; color: var(--green);
-    white-space: nowrap; margin-left: 10px;
-  }
-  .bom-item-remove {
-    background: none; border: none; color: var(--muted);
-    cursor: pointer; padding: 0 0 0 8px; font-size: 16px;
-    min-width: 32px; min-height: 32px;
-    display: flex; align-items: center; justify-content: center;
-    touch-action: manipulation;
-  }
-  .bom-empty { padding: 28px 18px; text-align: center; color: var(--muted); font-size: 13px; }
-  .bom-total {
-    padding: 14px 18px;
-    background: var(--surface);
-    border-top: 2px solid var(--border);
-    display: flex; justify-content: space-between; align-items: center;
-    flex-shrink: 0;
-  }
-  .bom-total-label {
-    font-family: 'Barlow Condensed', sans-serif;
-    font-size: 12px; font-weight: 700; letter-spacing: 1px;
-    text-transform: uppercase; color: var(--muted);
-  }
-  .bom-total-value {
-    font-family: 'Barlow Condensed', sans-serif;
-    font-size: 26px; font-weight: 800; color: var(--accent);
-  }
-  .bom-actions { padding: 10px 14px; display: flex; gap: 8px; flex-shrink: 0; }
-  .bom-btn {
-    flex: 1; border: none; border-radius: 8px;
-    font-family: 'Barlow Condensed', sans-serif;
-    font-size: 12px; font-weight: 700; letter-spacing: 0.5px;
-    text-transform: uppercase; padding: 11px 8px; cursor: pointer;
-    white-space: nowrap; touch-action: manipulation; min-height: 44px;
-  }
-  .bom-btn.clear { background: var(--input-bg); color: var(--muted); }
-  .bom-btn.export { background: var(--accent); color: #000; }
-  .bom-btn.print { background: #2a3a5a; color: #6aa0e8; border: 1px solid #3a4d6e; }
+/* ── TOAST ── */
+.toast-wrap {
+  position: absolute;
+  top: 10px; left: 12px; right: 12px;
+  z-index: 100;
+  display: flex; flex-direction: column; gap: 8px;
+  pointer-events: none;
+}
+.toast {
+  background: var(--card);
+  border: 1px solid var(--border2);
+  border-radius: 12px;
+  padding: 11px 14px;
+  display: flex; align-items: center; gap: 10px;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.5);
+  transform: translateY(-80px);
+  opacity: 0;
+  transition: transform 0.3s cubic-bezier(.22,1,.36,1), opacity 0.3s;
+  pointer-events: auto;
+}
+.toast.show { transform: translateY(0); opacity: 1; }
+.toast.success { border-left: 3px solid var(--green); }
+.toast.error   { border-left: 3px solid var(--accent2); }
+.toast.info    { border-left: 3px solid var(--accent); }
+.toast-icon { font-size: 16px; }
+.toast-msg { font-size: 14px; font-weight: 500; }
+
+/* ── PRINT ── */
+@media print {
+  body * { visibility: hidden; }
+  #print-area, #print-area * { visibility: visible; }
+  #print-area { position: fixed; top: 0; left: 0; width: 100%; }
+}
 </style>
 </head>
 <body>
+<div class="app" id="app">
 
-<div class="toast-container" id="toastContainer"></div>
+  <!-- TOAST -->
+  <div class="toast-wrap" id="toastWrap"></div>
 
-<header>
-  <div class="logo-icon">S</div>
-  <h1>Steel <span>Weight</span></h1>
-  <span class="header-version">V6</span>
-</header>
+  <!-- HEADER -->
+  <div class="header">
+    <div class="logo-hex">S</div>
+    <div class="header-title">Steel <span>Weight</span></div>
+    <div class="header-badge">V7</div>
+  </div>
 
-<div class="tabs-wrap" id="tabsWrap">
-  <button class="tab-btn active" onclick="switchTab('plates', this)">Plates</button>
-  <button class="tab-btn" onclick="switchTab('channels', this)">Channels</button>
-  <button class="tab-btn" onclick="switchTab('beams', this)">Beams</button>
-  <button class="tab-btn" onclick="switchTab('purlin', this)">Purlin</button>
-  <button class="tab-btn" onclick="switchTab('roofing', this)">Roofing</button>
-  <button class="tab-btn" onclick="switchTab('angles', this)">Angles</button>
-  <button class="tab-btn" onclick="switchTab('flats', this)">Flats</button>
-  <button class="tab-btn" onclick="switchTab('decking', this)">Decking</button>
-  <button class="tab-btn" onclick="switchTab('pipes', this)">Hollow</button>
-</div>
-
-<div class="scroll-area" id="scrollArea">
-
-  <!-- MS PLATES -->
-  <div class="calc-panel active" id="panel-plates">
-    <div class="calc-card">
-      <div class="calc-header">
-        <span class="calc-badge">01</span>
-        <span class="calc-title">MS Plates / Sheets</span>
-      </div>
-      <div class="calc-body">
-        <div class="field-grid">
-          <div class="field"><label>Thickness (mm)</label><input type="number" inputmode="decimal" id="pl-thk" placeholder="e.g. 12" oninput="calcPlates()"></div>
-          <div class="field"><label>Width (mm)</label><input type="number" inputmode="decimal" id="pl-wid" placeholder="e.g. 2500" oninput="calcPlates()"></div>
-          <div class="field"><label>Length (mm)</label><input type="number" inputmode="decimal" id="pl-len" placeholder="e.g. 6000" oninput="calcPlates()"></div>
-          <div class="field"><label>Nos</label><input type="number" inputmode="numeric" id="pl-nos" placeholder="e.g. 2" oninput="calcPlates()"></div>
-        </div>
-        <div class="formula-hint">THK × WIDTH × LENGTH × NOS × 7.85 ÷ 1,000,000,000</div>
-        <div class="result-display">
-          <div><div class="result-label">Weight</div><div class="result-value" id="pl-result">—<span class="result-unit">MT</span></div></div>
-          <button class="copy-btn" onclick="copyResult('pl-result')" title="Copy">
-            <svg viewBox="0 0 20 20" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="7" y="7" width="10" height="11" rx="1.5"/><path d="M13 7V5a1.5 1.5 0 0 0-1.5-1.5h-7A1.5 1.5 0 0 0 3 5v9A1.5 1.5 0 0 0 4.5 15.5H7"/></svg>
-          </button>
-        </div>
-        <div class="btn-row"><button class="add-btn" onclick="addToBOM('plates')">+ Add to BOM</button><button class="clear-btn" onclick="clearSection('plates')">✕ Clear</button></div>
-      </div>
+  <!-- TABS -->
+  <div class="tabs-outer">
+    <div class="tabs-scroll" id="tabsScroll">
+      <button class="tab-btn active" onclick="switchTab('plates',this)">
+        <svg viewBox="0 0 22 16" width="22" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="square"><rect x="1" y="4" width="20" height="8" rx="0.5"/></svg>
+        <span class="tab-label">Plates</span>
+      </button>
+      <button class="tab-btn" onclick="switchTab('channels',this)">
+        <svg viewBox="0 0 18 20" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="square"><path d="M16 2H3V18H16"/></svg>
+        <span class="tab-label">Channels</span>
+      </button>
+      <button class="tab-btn" onclick="switchTab('beams',this)">
+        <svg viewBox="0 0 22 20" width="22" height="18" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="square"><line x1="2" y1="3" x2="20" y2="3"/><line x1="11" y1="3" x2="11" y2="17"/><line x1="2" y1="17" x2="20" y2="17"/></svg>
+        <span class="tab-label">Beams</span>
+      </button>
+      <button class="tab-btn" onclick="switchTab('purlin',this)">
+        <svg viewBox="0 0 22 20" width="22" height="18" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="square"><polyline points="2,4 11,4 11,10 13,10 13,16 20,16"/></svg>
+        <span class="tab-label">Purlin</span>
+      </button>
+      <button class="tab-btn" onclick="switchTab('roofing',this)">
+        <svg viewBox="0 0 22 20" width="22" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="1,16 5,6 9,16 13,6 17,16 21,6"/></svg>
+        <span class="tab-label">Roofing</span>
+      </button>
+      <button class="tab-btn" onclick="switchTab('angles',this)">
+        <svg viewBox="0 0 18 20" width="16" height="18" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="square"><polyline points="3,2 3,18 17,18"/></svg>
+        <span class="tab-label">Angles</span>
+      </button>
+      <button class="tab-btn" onclick="switchTab('flats',this)">
+        <svg viewBox="0 0 22 16" width="22" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="square"><rect x="1" y="5" width="20" height="6"/></svg>
+        <span class="tab-label">Flats</span>
+      </button>
+      <button class="tab-btn" onclick="switchTab('decking',this)">
+        <svg viewBox="0 0 24 18" width="24" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="square"><polyline points="1,14 5,6 9,14 13,6 17,14 21,6 23,6"/></svg>
+        <span class="tab-label">Decking</span>
+      </button>
+      <button class="tab-btn" onclick="switchTab('pipes',this)">
+        <svg viewBox="0 0 22 22" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><circle cx="11" cy="11" r="5"/></svg>
+        <span class="tab-label">Hollow</span>
+      </button>
     </div>
   </div>
 
-  <!-- CHANNELS -->
-  <div class="calc-panel" id="panel-channels">
-    <div class="calc-card">
-      <div class="calc-header"><span class="calc-badge">02</span><span class="calc-title">MS Channels (ISMC)</span></div>
-      <div class="calc-body">
-        <div class="field-grid">
-          <div class="field"><label>Size (mm)</label>
-            <select id="ch-size" onchange="updateChannelWt(); calcChannels()">
-              <option value="">Select Size</option>
-              <option value="75x40">75 × 40</option><option value="100x50">100 × 50</option>
-              <option value="125x65">125 × 65</option><option value="150x75">150 × 75</option>
-              <option value="175x75">175 × 75</option><option value="200x75a">200 × 75 (22.3)</option>
-              <option value="200x75b">200 × 75 (24.2)</option><option value="250x82">250 × 82</option>
-              <option value="300x90">300 × 90</option><option value="400x100">400 × 100</option>
-            </select>
-          </div>
-          <div class="field"><label>Length (mtr)</label>
-            <select id="ch-len" onchange="calcChannels()">
-              <option value="">Select</option><option value="6">6 Mtr</option><option value="12">12 Mtr</option>
-            </select>
-          </div>
-          <div class="field"><label>Nos</label><input type="number" inputmode="numeric" id="ch-nos" placeholder="e.g. 10" oninput="calcChannels()"></div>
-        </div>
-        <div class="wt-info" id="ch-wt-info" style="display:none"><span class="wt-info-label">Wt/Mtr</span><span class="wt-info-value" id="ch-wt-val">—</span><span class="wt-info-unit">kg/mtr</span></div>
-        <div class="formula-hint">Wt/Mtr × Length × Nos ÷ 1000</div>
-        <div class="result-display">
-          <div><div class="result-label">Weight</div><div class="result-value" id="ch-result">—<span class="result-unit">MT</span></div></div>
-          <button class="copy-btn" onclick="copyResult('ch-result')"><svg viewBox="0 0 20 20" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="7" y="7" width="10" height="11" rx="1.5"/><path d="M13 7V5a1.5 1.5 0 0 0-1.5-1.5h-7A1.5 1.5 0 0 0 3 5v9A1.5 1.5 0 0 0 4.5 15.5H7"/></svg></button>
-        </div>
-        <div class="btn-row"><button class="add-btn" onclick="addToBOM('channels')">+ Add to BOM</button><button class="clear-btn" onclick="clearSection('channels')">✕ Clear</button></div>
-      </div>
-    </div>
-  </div>
+  <!-- SCROLL AREA -->
+  <div class="scroll-area" id="scrollArea">
 
-  <!-- BEAMS -->
-  <div class="calc-panel" id="panel-beams">
-    <div class="calc-card">
-      <div class="calc-header"><span class="calc-badge">03</span><span class="calc-title">RS Joists / Beams (ISMB)</span></div>
-      <div class="calc-body">
-        <div class="field-grid">
-          <div class="field"><label>Size (mm)</label>
-            <select id="bm-size" onchange="updateBeamWt(); calcBeams()">
-              <option value="">Select Size</option>
-              <option value="100x50">100 × 50</option><option value="125x70">125 × 70</option>
-              <option value="150x75">150 × 75</option><option value="200x100">200 × 100</option>
-              <option value="225x110">225 × 110</option><option value="250x125">250 × 125</option>
-              <option value="300x140">300 × 140</option><option value="350x140">350 × 140</option>
-              <option value="400x140">400 × 140</option><option value="450x150">450 × 150</option>
-              <option value="500x180">500 × 180</option><option value="600x210">600 × 210</option>
-            </select>
-          </div>
-          <div class="field"><label>Length (mtr)</label>
-            <select id="bm-len" onchange="calcBeams()">
-              <option value="">Select</option><option value="6">6 Mtr</option><option value="12">12 Mtr</option>
-            </select>
-          </div>
-          <div class="field"><label>Nos</label><input type="number" inputmode="numeric" id="bm-nos" placeholder="e.g. 5" oninput="calcBeams()"></div>
+    <!-- MS PLATES -->
+    <div class="calc-panel active" id="panel-plates">
+      <div class="calc-card">
+        <div class="calc-card-header">
+          <div class="sec-badge">01</div>
+          <div class="calc-card-title">MS Plates / Sheets</div>
         </div>
-        <div class="wt-info" id="bm-wt-info" style="display:none"><span class="wt-info-label">Wt/Mtr</span><span class="wt-info-value" id="bm-wt-val">—</span><span class="wt-info-unit">kg/mtr</span></div>
-        <div class="formula-hint">Wt/Mtr × Length × Nos ÷ 1000</div>
-        <div class="result-display">
-          <div><div class="result-label">Weight</div><div class="result-value" id="bm-result">—<span class="result-unit">MT</span></div></div>
-          <button class="copy-btn" onclick="copyResult('bm-result')"><svg viewBox="0 0 20 20" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="7" y="7" width="10" height="11" rx="1.5"/><path d="M13 7V5a1.5 1.5 0 0 0-1.5-1.5h-7A1.5 1.5 0 0 0 3 5v9A1.5 1.5 0 0 0 4.5 15.5H7"/></svg></button>
-        </div>
-        <div class="btn-row"><button class="add-btn" onclick="addToBOM('beams')">+ Add to BOM</button><button class="clear-btn" onclick="clearSection('beams')">✕ Clear</button></div>
-      </div>
-    </div>
-  </div>
-
-  <!-- PURLIN -->
-  <div class="calc-panel" id="panel-purlin">
-    <div class="calc-card">
-      <div class="calc-header"><span class="calc-badge">04</span><span class="calc-title">Purlin (2mm × 200 × 60 × 60 × 20)</span></div>
-      <div class="calc-body">
-        <div class="field-grid">
-          <div class="field"><label>Length (mtr)</label><input type="number" inputmode="decimal" id="pu-len" placeholder="e.g. 6" oninput="calcPurlin()"></div>
-          <div class="field"><label>Nos</label><input type="number" inputmode="numeric" id="pu-nos" placeholder="e.g. 20" oninput="calcPurlin()"></div>
-        </div>
-        <div class="formula-hint">Length × 5.5 × Nos ÷ 1000</div>
-        <div class="result-display">
-          <div><div class="result-label">Weight</div><div class="result-value" id="pu-result">—<span class="result-unit">MT</span></div></div>
-          <button class="copy-btn" onclick="copyResult('pu-result')"><svg viewBox="0 0 20 20" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="7" y="7" width="10" height="11" rx="1.5"/><path d="M13 7V5a1.5 1.5 0 0 0-1.5-1.5h-7A1.5 1.5 0 0 0 3 5v9A1.5 1.5 0 0 0 4.5 15.5H7"/></svg></button>
-        </div>
-        <div class="btn-row"><button class="add-btn" onclick="addToBOM('purlin')">+ Add to BOM</button><button class="clear-btn" onclick="clearSection('purlin')">✕ Clear</button></div>
-      </div>
-    </div>
-  </div>
-
-  <!-- ROOFING -->
-  <div class="calc-panel" id="panel-roofing">
-    <div class="calc-card">
-      <div class="calc-header"><span class="calc-badge">05</span><span class="calc-title">Roofing Sheet</span></div>
-      <div class="calc-body">
-        <div class="field-grid">
-          <div class="field"><label>Type</label>
-            <select id="rf-type" onchange="calcRoofing()">
-              <option value="">Select Type</option>
-              <option value="cc">Colour Coated — 4.5 kg/mtr</option>
-              <option value="bgl">BGL Roof Sheet — 4.35 kg/mtr</option>
-            </select>
-          </div>
-          <div class="field"><label>Length (mtr)</label><input type="number" inputmode="decimal" id="rf-len" placeholder="e.g. 6" oninput="calcRoofing()"></div>
-          <div class="field"><label>Nos</label><input type="number" inputmode="numeric" id="rf-nos" placeholder="e.g. 30" oninput="calcRoofing()"></div>
-        </div>
-        <div class="formula-hint">CC: 4.5 × L × Nos ÷ 1000 | BGL: 4.35 × L × Nos ÷ 1000</div>
-        <div class="result-display">
-          <div><div class="result-label">Weight</div><div class="result-value" id="rf-result">—<span class="result-unit">MT</span></div></div>
-          <button class="copy-btn" onclick="copyResult('rf-result')"><svg viewBox="0 0 20 20" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="7" y="7" width="10" height="11" rx="1.5"/><path d="M13 7V5a1.5 1.5 0 0 0-1.5-1.5h-7A1.5 1.5 0 0 0 3 5v9A1.5 1.5 0 0 0 4.5 15.5H7"/></svg></button>
-        </div>
-        <div class="btn-row"><button class="add-btn" onclick="addToBOM('roofing')">+ Add to BOM</button><button class="clear-btn" onclick="clearSection('roofing')">✕ Clear</button></div>
-      </div>
-    </div>
-  </div>
-
-  <!-- MS EQUAL ANGLES -->
-  <div class="calc-panel" id="panel-angles">
-    <div class="calc-card">
-      <div class="calc-header"><span class="calc-badge">06</span><span class="calc-title">MS Equal Angles (ISA)</span></div>
-      <div class="calc-body">
-        <div class="field-grid">
-          <div class="field"><label>Size (mm)</label><select id="ag-size" onchange="updateAngleTHK(); calcAngles()"><option value="">Select Size</option></select></div>
-          <div class="field"><label>Thickness (mm)</label><select id="ag-thk" onchange="updateAngleWt(); calcAngles()"><option value="">Select THK</option></select></div>
-          <div class="field"><label>Length (mtr)</label><select id="ag-len" onchange="calcAngles()"><option value="">Select</option><option value="6">6 Mtr</option><option value="12">12 Mtr</option></select></div>
-          <div class="field"><label>Nos</label><input type="number" inputmode="numeric" id="ag-nos" placeholder="e.g. 10" oninput="calcAngles()"></div>
-        </div>
-        <div class="wt-info" id="ag-wt-info" style="display:none"><span class="wt-info-label">Wt/Mtr</span><span class="wt-info-value" id="ag-wt-val">—</span><span class="wt-info-unit">kg/mtr</span></div>
-        <div class="formula-hint">Wt/Mtr × Length × Nos ÷ 1000</div>
-        <div class="result-display">
-          <div><div class="result-label">Weight</div><div class="result-value" id="ag-result">—<span class="result-unit">MT</span></div></div>
-          <button class="copy-btn" onclick="copyResult('ag-result')"><svg viewBox="0 0 20 20" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="7" y="7" width="10" height="11" rx="1.5"/><path d="M13 7V5a1.5 1.5 0 0 0-1.5-1.5h-7A1.5 1.5 0 0 0 3 5v9A1.5 1.5 0 0 0 4.5 15.5H7"/></svg></button>
-        </div>
-        <div class="btn-row"><button class="add-btn" onclick="addToBOM('angles')">+ Add to BOM</button><button class="clear-btn" onclick="clearSection('angles')">✕ Clear</button></div>
-      </div>
-    </div>
-  </div>
-
-  <!-- MS FLATS -->
-  <div class="calc-panel" id="panel-flats">
-    <div class="calc-card">
-      <div class="calc-header"><span class="calc-badge">07</span><span class="calc-title">MS Flats (ISF)</span></div>
-      <div class="calc-body">
-        <div class="field-grid">
-          <div class="field"><label>Size (mm)</label><select id="fl-size" onchange="updateFlatTHK(); calcFlats()"><option value="">Select Size</option></select></div>
-          <div class="field"><label>Thickness (mm)</label><select id="fl-thk" onchange="updateFlatWt(); calcFlats()"><option value="">Select THK</option></select></div>
-          <div class="field"><label>Length (mtr)</label><select id="fl-len" onchange="calcFlats()"><option value="">Select</option><option value="6">6 Mtr</option><option value="12">12 Mtr</option></select></div>
-          <div class="field"><label>Nos</label><input type="number" inputmode="numeric" id="fl-nos" placeholder="e.g. 10" oninput="calcFlats()"></div>
-        </div>
-        <div class="wt-info" id="fl-wt-info" style="display:none"><span class="wt-info-label">Wt/Mtr</span><span class="wt-info-value" id="fl-wt-val">—</span><span class="wt-info-unit">kg/mtr</span></div>
-        <div class="formula-hint">Wt/Mtr × Length × Nos ÷ 1000</div>
-        <div class="result-display">
-          <div><div class="result-label">Weight</div><div class="result-value" id="fl-result">—<span class="result-unit">MT</span></div></div>
-          <button class="copy-btn" onclick="copyResult('fl-result')"><svg viewBox="0 0 20 20" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="7" y="7" width="10" height="11" rx="1.5"/><path d="M13 7V5a1.5 1.5 0 0 0-1.5-1.5h-7A1.5 1.5 0 0 0 3 5v9A1.5 1.5 0 0 0 4.5 15.5H7"/></svg></button>
-        </div>
-        <div class="btn-row"><button class="add-btn" onclick="addToBOM('flats')">+ Add to BOM</button><button class="clear-btn" onclick="clearSection('flats')">✕ Clear</button></div>
-      </div>
-    </div>
-  </div>
-
-  <!-- DECKING SHEET -->
-  <div class="calc-panel" id="panel-decking">
-    <div class="calc-card">
-      <div class="calc-header"><span class="calc-badge">08</span><span class="calc-title">Decking Sheet (W: 960mm)</span></div>
-      <div class="calc-body">
-        <div class="field-grid">
-          <div class="field"><label>Thickness (mm)</label>
-            <select id="dk-thk" onchange="calcDecking()">
-              <option value="">Select THK</option>
-              <option value="0.8">0.8 mm (7.5 kg/mtr)</option>
-              <option value="0.9">0.9 mm (8.5 kg/mtr)</option>
-              <option value="1.0">1.0 mm (9.5 kg/mtr)</option>
-              <option value="1.2">1.2 mm (11.5 kg/mtr)</option>
-            </select>
-          </div>
-          <div class="field"><label>Length (mtr)</label><input type="number" inputmode="decimal" id="dk-len" placeholder="e.g. 6" oninput="calcDecking()"></div>
-          <div class="field"><label>Nos</label><input type="number" inputmode="numeric" id="dk-nos" placeholder="e.g. 25" oninput="calcDecking()"></div>
-        </div>
-        <div class="formula-hint">0.8→7.5 | 0.9→8.5 | 1.0→9.5 | 1.2→11.5 kg/mtr × L × Nos ÷ 1000</div>
-        <div class="result-display">
-          <div><div class="result-label">Weight</div><div class="result-value" id="dk-result">—<span class="result-unit">MT</span></div></div>
-          <button class="copy-btn" onclick="copyResult('dk-result')"><svg viewBox="0 0 20 20" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="7" y="7" width="10" height="11" rx="1.5"/><path d="M13 7V5a1.5 1.5 0 0 0-1.5-1.5h-7A1.5 1.5 0 0 0 3 5v9A1.5 1.5 0 0 0 4.5 15.5H7"/></svg></button>
-        </div>
-        <div class="btn-row"><button class="add-btn" onclick="addToBOM('decking')">+ Add to BOM</button><button class="clear-btn" onclick="clearSection('decking')">✕ Clear</button></div>
-      </div>
-    </div>
-  </div>
-
-  <!-- HOLLOW SECTIONS -->
-  <div class="calc-panel" id="panel-pipes">
-    <div class="calc-card">
-      <div class="calc-header">
-        <span class="calc-badge">09</span>
-        <span class="calc-title">Hollow Structural Sections</span>
-      </div>
-      <div class="calc-body">
-        <div class="pipe-mode-wrap" style="margin-bottom:14px">
-          <button id="hs-chs" class="active" onclick="setHSType('chs')">CHS</button>
-          <button id="hs-shs" onclick="setHSType('shs')">SHS</button>
-          <button id="hs-rhs" onclick="setHSType('rhs')">RHS</button>
-        </div>
-
-        <!-- CHS -->
-        <div id="hs-chs-section">
-          <div style="display:flex;gap:0;border:1px solid var(--border);border-radius:6px;overflow:hidden;margin-bottom:12px">
-            <button id="pi-mode-nb" onclick="setPipeMode('nb')" style="flex:1;padding:8px 0;background:var(--accent);color:#000;border:none;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:12px;letter-spacing:1px;cursor:pointer;touch-action:manipulation">BY NB</button>
-            <button id="pi-mode-od" onclick="setPipeMode('od')" style="flex:1;padding:8px 0;background:transparent;color:var(--muted);border:none;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:12px;letter-spacing:1px;cursor:pointer;touch-action:manipulation">BY OD</button>
-          </div>
-          <div id="pi-nb-row" class="field-grid cols-1" style="margin-bottom:12px">
-            <div class="field"><label>Nominal Bore (NB)</label>
-              <select id="pi-nb" onchange="applyNB(); calcPipes()">
-                <option value="">Select NB</option>
-                <option value="15">NB 15 (OD 21.3mm)</option><option value="20">NB 20 (OD 26.9mm)</option>
-                <option value="25">NB 25 (OD 33.7mm)</option><option value="32">NB 32 (OD 42.4mm)</option>
-                <option value="40">NB 40 (OD 48.3mm)</option><option value="50">NB 50 (OD 60.3mm)</option>
-                <option value="65">NB 65 (OD 76.1mm)</option><option value="80">NB 80 (OD 88.9mm)</option>
-                <option value="100">NB 100 (OD 114.3mm)</option><option value="125">NB 125 (OD 139.7mm)</option>
-                <option value="150">NB 150 (OD 168.3mm)</option><option value="200">NB 200 (OD 219.1mm)</option>
-                <option value="250">NB 250 (OD 273mm)</option><option value="300">NB 300 (OD 323.9mm)</option>
-                <option value="350">NB 350 (OD 355.6mm)</option><option value="400">NB 400 (OD 406.4mm)</option>
-              </select>
+        <div class="calc-body">
+          <div class="field-grid">
+            <div class="field">
+              <label>Thickness (mm)</label>
+              <input type="text" inputmode="none" readonly id="pl-thk" placeholder="e.g. 12" onclick="openKB(this,'Thickness (mm)')">
+            </div>
+            <div class="field">
+              <label>Width (mm)</label>
+              <input type="text" inputmode="none" readonly id="pl-wid" placeholder="e.g. 2500" onclick="openKB(this,'Width (mm)')">
+            </div>
+            <div class="field">
+              <label>Length (mm)</label>
+              <input type="text" inputmode="none" readonly id="pl-len" placeholder="e.g. 6000" onclick="openKB(this,'Length (mm)')">
+            </div>
+            <div class="field">
+              <label>Nos</label>
+              <input type="text" inputmode="none" readonly id="pl-nos" placeholder="e.g. 2" onclick="openKB(this,'Nos')">
             </div>
           </div>
-          <div class="field-grid">
-            <div class="field"><label>Outer Diameter (mm)</label><input type="number" inputmode="decimal" id="pi-od" placeholder="e.g. 48.3" oninput="calcPipes()" readonly style="opacity:0.5;cursor:not-allowed"></div>
-            <div class="field"><label>Wall Thickness (mm)</label><input type="number" inputmode="decimal" id="pi-wt" placeholder="e.g. 3.2" oninput="calcPipes()"></div>
-            <div class="field"><label>Length (mtr)</label><input type="number" inputmode="decimal" id="pi-len" placeholder="e.g. 6" oninput="calcPipes()"></div>
-            <div class="field"><label>Nos</label><input type="number" inputmode="numeric" id="pi-nos" placeholder="e.g. 10" oninput="calcPipes()"></div>
+          <div class="formula-row">
+            <svg viewBox="0 0 16 16" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><circle cx="8" cy="8" r="7"/><line x1="8" y1="7" x2="8" y2="11"/><circle cx="8" cy="5" r="0.5" fill="currentColor"/></svg>
+            <span class="formula-text">THK × WIDTH × LENGTH × NOS × 7.85 ÷ 1,000,000,000</span>
           </div>
-          <div class="wt-info" id="pi-wt-info" style="display:none"><span class="wt-info-label">Wt/Mtr</span><span class="wt-info-value" id="pi-wt-val">—</span><span class="wt-info-unit">kg/mtr</span></div>
-          <div class="formula-hint">Wt/Mtr = (OD − WT) × WT × 0.02466 | Total = Wt/Mtr × L × Nos ÷ 1000</div>
-        </div>
-
-        <!-- SHS -->
-        <div id="hs-shs-section" style="display:none">
-          <div class="field-grid">
-            <div class="field"><label>Side (mm)</label><input type="number" inputmode="decimal" id="shs-side" placeholder="e.g. 50" oninput="calcSHS()"></div>
-            <div class="field"><label>Wall Thickness (mm)</label><input type="number" inputmode="decimal" id="shs-thk" placeholder="e.g. 3" oninput="calcSHS()"></div>
-            <div class="field"><label>Length (mtr)</label><input type="number" inputmode="decimal" id="shs-len" placeholder="e.g. 6" oninput="calcSHS()"></div>
-            <div class="field"><label>Nos</label><input type="number" inputmode="numeric" id="shs-nos" placeholder="e.g. 10" oninput="calcSHS()"></div>
+          <div class="result-display">
+            <div>
+              <div class="result-label">Weight</div>
+              <div class="result-value" id="pl-result">—<span class="result-unit">MT</span></div>
+            </div>
+            <button class="copy-btn" onclick="copyResult('pl-result')">
+              <svg viewBox="0 0 20 20" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="7" y="7" width="10" height="11" rx="1.5"/><path d="M13 7V5a1.5 1.5 0 0 0-1.5-1.5h-7A1.5 1.5 0 0 0 3 5v9A1.5 1.5 0 0 0 4.5 15.5H7"/></svg>
+            </button>
           </div>
-          <div class="wt-info" id="shs-wt-info" style="display:none"><span class="wt-info-label">Wt/Mtr</span><span class="wt-info-value" id="shs-wt-val">—</span><span class="wt-info-unit">kg/mtr</span></div>
-          <div class="formula-hint">4 × THK × (Side − THK) × 7.85 ÷ 1000 × L × Nos ÷ 1000</div>
-        </div>
-
-        <!-- RHS -->
-        <div id="hs-rhs-section" style="display:none">
-          <div class="field-grid">
-            <div class="field"><label>Width (mm)</label><input type="number" inputmode="decimal" id="rhs-wid" placeholder="e.g. 100" oninput="calcRHS()"></div>
-            <div class="field"><label>Height (mm)</label><input type="number" inputmode="decimal" id="rhs-hgt" placeholder="e.g. 50" oninput="calcRHS()"></div>
-            <div class="field"><label>Wall Thickness (mm)</label><input type="number" inputmode="decimal" id="rhs-thk" placeholder="e.g. 3" oninput="calcRHS()"></div>
-            <div class="field"><label>Length (mtr)</label><input type="number" inputmode="decimal" id="rhs-len" placeholder="e.g. 6" oninput="calcRHS()"></div>
-            <div class="field"><label>Nos</label><input type="number" inputmode="numeric" id="rhs-nos" placeholder="e.g. 10" oninput="calcRHS()"></div>
+          <div class="btn-row">
+            <button class="add-btn" onclick="addToBOM('plates')">+ Add to BOM</button>
+            <button class="clear-btn" onclick="clearSection('plates')">
+              <svg viewBox="0 0 20 20" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3,6 17,6"/><path d="M8,6V4h4v2"/><rect x="5" y="6" width="10" height="11" rx="1"/></svg>
+              Clear
+            </button>
           </div>
-          <div class="wt-info" id="rhs-wt-info" style="display:none"><span class="wt-info-label">Wt/Mtr</span><span class="wt-info-value" id="rhs-wt-val">—</span><span class="wt-info-unit">kg/mtr</span></div>
-          <div class="formula-hint">2 × THK × (W + H − 2×THK) × 7.85 ÷ 1000 × L × Nos ÷ 1000</div>
         </div>
+      </div>
+      <div class="recent-card" id="recent-plates"></div>
+    </div>
 
-        <div class="result-display" style="margin-top:16px">
-          <div><div class="result-label">Weight</div><div class="result-value" id="pi-result">—<span class="result-unit">MT</span></div></div>
-          <button class="copy-btn" onclick="copyResult('pi-result')"><svg viewBox="0 0 20 20" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="7" y="7" width="10" height="11" rx="1.5"/><path d="M13 7V5a1.5 1.5 0 0 0-1.5-1.5h-7A1.5 1.5 0 0 0 3 5v9A1.5 1.5 0 0 0 4.5 15.5H7"/></svg></button>
+    <!-- MS CHANNELS -->
+    <div class="calc-panel" id="panel-channels">
+      <div class="calc-card">
+        <div class="calc-card-header">
+          <div class="sec-badge">02</div>
+          <div class="calc-card-title">MS Channels (ISMC)</div>
         </div>
-        <div class="btn-row"><button class="add-btn" onclick="addToBOM('pipes')">+ Add to BOM</button><button class="clear-btn" onclick="clearSection('pipes')">✕ Clear</button></div>
+        <div class="calc-body">
+          <div class="field-grid">
+            <div class="field">
+              <label>Size (mm)</label>
+              <select id="ch-size" onchange="updateChannelWt();calcChannels()">
+                <option value="">Select Size</option>
+                <option value="75x40">75 × 40</option>
+                <option value="100x50">100 × 50</option>
+                <option value="125x65">125 × 65</option>
+                <option value="150x75">150 × 75</option>
+                <option value="175x75">175 × 75</option>
+                <option value="200x75a">200 × 75 (22.3)</option>
+                <option value="200x75b">200 × 75 (24.2)</option>
+                <option value="250x82">250 × 82</option>
+                <option value="300x90">300 × 90</option>
+                <option value="400x100">400 × 100</option>
+              </select>
+            </div>
+            <div class="field">
+              <label>Length (mtr)</label>
+              <select id="ch-len" onchange="calcChannels()">
+                <option value="">Select</option>
+                <option value="6">6 Mtr</option>
+                <option value="12">12 Mtr</option>
+              </select>
+            </div>
+            <div class="field">
+              <label>Nos</label>
+              <input type="text" inputmode="none" readonly id="ch-nos" placeholder="e.g. 10" onclick="openKB(this,'Nos')">
+            </div>
+          </div>
+          <div class="wt-info" id="ch-wt-info">
+            <span class="wt-info-label">Wt/Mtr</span>
+            <span class="wt-info-value" id="ch-wt-val">—</span>
+            <span class="wt-info-unit">kg/mtr</span>
+          </div>
+          <div class="formula-row">
+            <svg viewBox="0 0 16 16" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><circle cx="8" cy="8" r="7"/><line x1="8" y1="7" x2="8" y2="11"/><circle cx="8" cy="5" r="0.5" fill="currentColor"/></svg>
+            <span class="formula-text">Wt/Mtr × Length × Nos ÷ 1000</span>
+          </div>
+          <div class="result-display">
+            <div>
+              <div class="result-label">Weight</div>
+              <div class="result-value" id="ch-result">—<span class="result-unit">MT</span></div>
+            </div>
+            <button class="copy-btn" onclick="copyResult('ch-result')">
+              <svg viewBox="0 0 20 20" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="7" y="7" width="10" height="11" rx="1.5"/><path d="M13 7V5a1.5 1.5 0 0 0-1.5-1.5h-7A1.5 1.5 0 0 0 3 5v9A1.5 1.5 0 0 0 4.5 15.5H7"/></svg>
+            </button>
+          </div>
+          <div class="btn-row">
+            <button class="add-btn" onclick="addToBOM('channels')">+ Add to BOM</button>
+            <button class="clear-btn" onclick="clearSection('channels')">
+              <svg viewBox="0 0 20 20" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3,6 17,6"/><path d="M8,6V4h4v2"/><rect x="5" y="6" width="10" height="11" rx="1"/></svg>
+              Clear
+            </button>
+          </div>
+        </div>
+      </div>
+      <div class="recent-card" id="recent-channels"></div>
+    </div>
+
+    <!-- BEAMS -->
+    <div class="calc-panel" id="panel-beams">
+      <div class="calc-card">
+        <div class="calc-card-header">
+          <div class="sec-badge">03</div>
+          <div class="calc-card-title">RS Joists / Beams (ISMB)</div>
+        </div>
+        <div class="calc-body">
+          <div class="field-grid">
+            <div class="field">
+              <label>Size (mm)</label>
+              <select id="bm-size" onchange="updateBeamWt();calcBeams()">
+                <option value="">Select Size</option>
+                <option value="100x50">100 × 50</option>
+                <option value="125x70">125 × 70</option>
+                <option value="150x75">150 × 75</option>
+                <option value="200x100">200 × 100</option>
+                <option value="225x110">225 × 110</option>
+                <option value="250x125">250 × 125</option>
+                <option value="300x140">300 × 140</option>
+                <option value="350x140">350 × 140</option>
+                <option value="400x140">400 × 140</option>
+                <option value="450x150">450 × 150</option>
+                <option value="500x180">500 × 180</option>
+                <option value="600x210">600 × 210</option>
+              </select>
+            </div>
+            <div class="field">
+              <label>Length (mtr)</label>
+              <select id="bm-len" onchange="calcBeams()">
+                <option value="">Select</option>
+                <option value="6">6 Mtr</option>
+                <option value="12">12 Mtr</option>
+              </select>
+            </div>
+            <div class="field">
+              <label>Nos</label>
+              <input type="text" inputmode="none" readonly id="bm-nos" placeholder="e.g. 5" onclick="openKB(this,'Nos')">
+            </div>
+          </div>
+          <div class="wt-info" id="bm-wt-info">
+            <span class="wt-info-label">Wt/Mtr</span>
+            <span class="wt-info-value" id="bm-wt-val">—</span>
+            <span class="wt-info-unit">kg/mtr</span>
+          </div>
+          <div class="formula-row">
+            <svg viewBox="0 0 16 16" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><circle cx="8" cy="8" r="7"/><line x1="8" y1="7" x2="8" y2="11"/><circle cx="8" cy="5" r="0.5" fill="currentColor"/></svg>
+            <span class="formula-text">Wt/Mtr × Length × Nos ÷ 1000</span>
+          </div>
+          <div class="result-display">
+            <div>
+              <div class="result-label">Weight</div>
+              <div class="result-value" id="bm-result">—<span class="result-unit">MT</span></div>
+            </div>
+            <button class="copy-btn" onclick="copyResult('bm-result')">
+              <svg viewBox="0 0 20 20" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="7" y="7" width="10" height="11" rx="1.5"/><path d="M13 7V5a1.5 1.5 0 0 0-1.5-1.5h-7A1.5 1.5 0 0 0 3 5v9A1.5 1.5 0 0 0 4.5 15.5H7"/></svg>
+            </button>
+          </div>
+          <div class="btn-row">
+            <button class="add-btn" onclick="addToBOM('beams')">+ Add to BOM</button>
+            <button class="clear-btn" onclick="clearSection('beams')">
+              <svg viewBox="0 0 20 20" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3,6 17,6"/><path d="M8,6V4h4v2"/><rect x="5" y="6" width="10" height="11" rx="1"/></svg>
+              Clear
+            </button>
+          </div>
+        </div>
+      </div>
+      <div class="recent-card" id="recent-beams"></div>
+    </div>
+
+    <!-- PURLIN -->
+    <div class="calc-panel" id="panel-purlin">
+      <div class="calc-card">
+        <div class="calc-card-header">
+          <div class="sec-badge">04</div>
+          <div class="calc-card-title">Purlin (2mm×200×60×60×20)</div>
+        </div>
+        <div class="calc-body">
+          <div class="field-grid">
+            <div class="field">
+              <label>Length (mtr)</label>
+              <input type="text" inputmode="none" readonly id="pu-len" placeholder="e.g. 6" onclick="openKB(this,'Length (mtr)')">
+            </div>
+            <div class="field">
+              <label>Nos</label>
+              <input type="text" inputmode="none" readonly id="pu-nos" placeholder="e.g. 20" onclick="openKB(this,'Nos')">
+            </div>
+          </div>
+          <div class="formula-row">
+            <svg viewBox="0 0 16 16" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><circle cx="8" cy="8" r="7"/><line x1="8" y1="7" x2="8" y2="11"/><circle cx="8" cy="5" r="0.5" fill="currentColor"/></svg>
+            <span class="formula-text">Length × 5.5 × Nos ÷ 1000</span>
+          </div>
+          <div class="result-display">
+            <div>
+              <div class="result-label">Weight</div>
+              <div class="result-value" id="pu-result">—<span class="result-unit">MT</span></div>
+            </div>
+            <button class="copy-btn" onclick="copyResult('pu-result')">
+              <svg viewBox="0 0 20 20" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="7" y="7" width="10" height="11" rx="1.5"/><path d="M13 7V5a1.5 1.5 0 0 0-1.5-1.5h-7A1.5 1.5 0 0 0 3 5v9A1.5 1.5 0 0 0 4.5 15.5H7"/></svg>
+            </button>
+          </div>
+          <div class="btn-row">
+            <button class="add-btn" onclick="addToBOM('purlin')">+ Add to BOM</button>
+            <button class="clear-btn" onclick="clearSection('purlin')">
+              <svg viewBox="0 0 20 20" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3,6 17,6"/><path d="M8,6V4h4v2"/><rect x="5" y="6" width="10" height="11" rx="1"/></svg>
+              Clear
+            </button>
+          </div>
+        </div>
+      </div>
+      <div class="recent-card" id="recent-purlin"></div>
+    </div>
+
+    <!-- ROOFING -->
+    <div class="calc-panel" id="panel-roofing">
+      <div class="calc-card">
+        <div class="calc-card-header">
+          <div class="sec-badge">05</div>
+          <div class="calc-card-title">Roofing Sheet</div>
+        </div>
+        <div class="calc-body">
+          <div class="field-grid">
+            <div class="field" style="grid-column:span 2">
+              <label>Type</label>
+              <select id="rf-type" onchange="calcRoofing()">
+                <option value="">Select Type</option>
+                <option value="cc">Colour Coated (CC) — 4.5 kg/mtr</option>
+                <option value="bgl">BGL Roof Sheet — 4.35 kg/mtr</option>
+              </select>
+            </div>
+            <div class="field">
+              <label>Length (mtr)</label>
+              <input type="text" inputmode="none" readonly id="rf-len" placeholder="e.g. 6" onclick="openKB(this,'Length (mtr)')">
+            </div>
+            <div class="field">
+              <label>Nos</label>
+              <input type="text" inputmode="none" readonly id="rf-nos" placeholder="e.g. 30" onclick="openKB(this,'Nos')">
+            </div>
+          </div>
+          <div class="formula-row">
+            <svg viewBox="0 0 16 16" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><circle cx="8" cy="8" r="7"/><line x1="8" y1="7" x2="8" y2="11"/><circle cx="8" cy="5" r="0.5" fill="currentColor"/></svg>
+            <span class="formula-text">CC: 4.5 × L × Nos ÷ 1000 &nbsp;|&nbsp; BGL: 4.35 × L × Nos ÷ 1000</span>
+          </div>
+          <div class="result-display">
+            <div>
+              <div class="result-label">Weight</div>
+              <div class="result-value" id="rf-result">—<span class="result-unit">MT</span></div>
+            </div>
+            <button class="copy-btn" onclick="copyResult('rf-result')">
+              <svg viewBox="0 0 20 20" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="7" y="7" width="10" height="11" rx="1.5"/><path d="M13 7V5a1.5 1.5 0 0 0-1.5-1.5h-7A1.5 1.5 0 0 0 3 5v9A1.5 1.5 0 0 0 4.5 15.5H7"/></svg>
+            </button>
+          </div>
+          <div class="btn-row">
+            <button class="add-btn" onclick="addToBOM('roofing')">+ Add to BOM</button>
+            <button class="clear-btn" onclick="clearSection('roofing')">
+              <svg viewBox="0 0 20 20" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3,6 17,6"/><path d="M8,6V4h4v2"/><rect x="5" y="6" width="10" height="11" rx="1"/></svg>
+              Clear
+            </button>
+          </div>
+        </div>
+      </div>
+      <div class="recent-card" id="recent-roofing"></div>
+    </div>
+
+    <!-- ANGLES -->
+    <div class="calc-panel" id="panel-angles">
+      <div class="calc-card">
+        <div class="calc-card-header">
+          <div class="sec-badge">06</div>
+          <div class="calc-card-title">MS Equal Angles (ISA)</div>
+        </div>
+        <div class="calc-body">
+          <div class="field-grid">
+            <div class="field">
+              <label>Size (mm)</label>
+              <select id="ag-size" onchange="updateAngleTHK();calcAngles()">
+                <option value="">Select Size</option>
+              </select>
+            </div>
+            <div class="field">
+              <label>Thickness (mm)</label>
+              <select id="ag-thk" onchange="updateAngleWt();calcAngles()">
+                <option value="">Select THK</option>
+              </select>
+            </div>
+            <div class="field">
+              <label>Length (mtr)</label>
+              <select id="ag-len" onchange="calcAngles()">
+                <option value="">Select</option>
+                <option value="6">6 Mtr</option>
+                <option value="12">12 Mtr</option>
+              </select>
+            </div>
+            <div class="field">
+              <label>Nos</label>
+              <input type="text" inputmode="none" readonly id="ag-nos" placeholder="e.g. 10" onclick="openKB(this,'Nos')">
+            </div>
+          </div>
+          <div class="wt-info" id="ag-wt-info">
+            <span class="wt-info-label">Wt/Mtr</span>
+            <span class="wt-info-value" id="ag-wt-val">—</span>
+            <span class="wt-info-unit">kg/mtr</span>
+          </div>
+          <div class="formula-row">
+            <svg viewBox="0 0 16 16" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><circle cx="8" cy="8" r="7"/><line x1="8" y1="7" x2="8" y2="11"/><circle cx="8" cy="5" r="0.5" fill="currentColor"/></svg>
+            <span class="formula-text">Wt/Mtr × Length × Nos ÷ 1000</span>
+          </div>
+          <div class="result-display">
+            <div>
+              <div class="result-label">Weight</div>
+              <div class="result-value" id="ag-result">—<span class="result-unit">MT</span></div>
+            </div>
+            <button class="copy-btn" onclick="copyResult('ag-result')">
+              <svg viewBox="0 0 20 20" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="7" y="7" width="10" height="11" rx="1.5"/><path d="M13 7V5a1.5 1.5 0 0 0-1.5-1.5h-7A1.5 1.5 0 0 0 3 5v9A1.5 1.5 0 0 0 4.5 15.5H7"/></svg>
+            </button>
+          </div>
+          <div class="btn-row">
+            <button class="add-btn" onclick="addToBOM('angles')">+ Add to BOM</button>
+            <button class="clear-btn" onclick="clearSection('angles')">
+              <svg viewBox="0 0 20 20" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3,6 17,6"/><path d="M8,6V4h4v2"/><rect x="5" y="6" width="10" height="11" rx="1"/></svg>
+              Clear
+            </button>
+          </div>
+        </div>
+      </div>
+      <div class="recent-card" id="recent-angles"></div>
+    </div>
+
+    <!-- FLATS -->
+    <div class="calc-panel" id="panel-flats">
+      <div class="calc-card">
+        <div class="calc-card-header">
+          <div class="sec-badge">07</div>
+          <div class="calc-card-title">MS Flats (ISF)</div>
+        </div>
+        <div class="calc-body">
+          <div class="field-grid">
+            <div class="field">
+              <label>Size (mm)</label>
+              <select id="fl-size" onchange="updateFlatTHK();calcFlats()">
+                <option value="">Select Size</option>
+              </select>
+            </div>
+            <div class="field">
+              <label>Thickness (mm)</label>
+              <select id="fl-thk" onchange="updateFlatWt();calcFlats()">
+                <option value="">Select THK</option>
+              </select>
+            </div>
+            <div class="field">
+              <label>Length (mtr)</label>
+              <select id="fl-len" onchange="calcFlats()">
+                <option value="">Select</option>
+                <option value="6">6 Mtr</option>
+                <option value="12">12 Mtr</option>
+              </select>
+            </div>
+            <div class="field">
+              <label>Nos</label>
+              <input type="text" inputmode="none" readonly id="fl-nos" placeholder="e.g. 10" onclick="openKB(this,'Nos')">
+            </div>
+          </div>
+          <div class="wt-info" id="fl-wt-info">
+            <span class="wt-info-label">Wt/Mtr</span>
+            <span class="wt-info-value" id="fl-wt-val">—</span>
+            <span class="wt-info-unit">kg/mtr</span>
+          </div>
+          <div class="formula-row">
+            <svg viewBox="0 0 16 16" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><circle cx="8" cy="8" r="7"/><line x1="8" y1="7" x2="8" y2="11"/><circle cx="8" cy="5" r="0.5" fill="currentColor"/></svg>
+            <span class="formula-text">Wt/Mtr × Length × Nos ÷ 1000</span>
+          </div>
+          <div class="result-display">
+            <div>
+              <div class="result-label">Weight</div>
+              <div class="result-value" id="fl-result">—<span class="result-unit">MT</span></div>
+            </div>
+            <button class="copy-btn" onclick="copyResult('fl-result')">
+              <svg viewBox="0 0 20 20" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="7" y="7" width="10" height="11" rx="1.5"/><path d="M13 7V5a1.5 1.5 0 0 0-1.5-1.5h-7A1.5 1.5 0 0 0 3 5v9A1.5 1.5 0 0 0 4.5 15.5H7"/></svg>
+            </button>
+          </div>
+          <div class="btn-row">
+            <button class="add-btn" onclick="addToBOM('flats')">+ Add to BOM</button>
+            <button class="clear-btn" onclick="clearSection('flats')">
+              <svg viewBox="0 0 20 20" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3,6 17,6"/><path d="M8,6V4h4v2"/><rect x="5" y="6" width="10" height="11" rx="1"/></svg>
+              Clear
+            </button>
+          </div>
+        </div>
+      </div>
+      <div class="recent-card" id="recent-flats"></div>
+    </div>
+
+    <!-- DECKING -->
+    <div class="calc-panel" id="panel-decking">
+      <div class="calc-card">
+        <div class="calc-card-header">
+          <div class="sec-badge">08</div>
+          <div class="calc-card-title">Decking Sheet (960mm)</div>
+        </div>
+        <div class="calc-body">
+          <div class="field-grid">
+            <div class="field" style="grid-column:span 2">
+              <label>Thickness (mm)</label>
+              <select id="dk-thk" onchange="calcDecking()">
+                <option value="">Select THK</option>
+                <option value="0.8">0.8 mm (7.5 kg/mtr)</option>
+                <option value="0.9">0.9 mm (8.5 kg/mtr)</option>
+                <option value="1.0">1.0 mm (9.5 kg/mtr)</option>
+                <option value="1.2">1.2 mm (11.5 kg/mtr)</option>
+              </select>
+            </div>
+            <div class="field">
+              <label>Length (mtr)</label>
+              <input type="text" inputmode="none" readonly id="dk-len" placeholder="e.g. 6" onclick="openKB(this,'Length (mtr)')">
+            </div>
+            <div class="field">
+              <label>Nos</label>
+              <input type="text" inputmode="none" readonly id="dk-nos" placeholder="e.g. 25" onclick="openKB(this,'Nos')">
+            </div>
+          </div>
+          <div class="formula-row">
+            <svg viewBox="0 0 16 16" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><circle cx="8" cy="8" r="7"/><line x1="8" y1="7" x2="8" y2="11"/><circle cx="8" cy="5" r="0.5" fill="currentColor"/></svg>
+            <span class="formula-text">0.8→7.5 | 0.9→8.5 | 1.0→9.5 | 1.2→11.5 × L × Nos ÷ 1000</span>
+          </div>
+          <div class="result-display">
+            <div>
+              <div class="result-label">Weight</div>
+              <div class="result-value" id="dk-result">—<span class="result-unit">MT</span></div>
+            </div>
+            <button class="copy-btn" onclick="copyResult('dk-result')">
+              <svg viewBox="0 0 20 20" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="7" y="7" width="10" height="11" rx="1.5"/><path d="M13 7V5a1.5 1.5 0 0 0-1.5-1.5h-7A1.5 1.5 0 0 0 3 5v9A1.5 1.5 0 0 0 4.5 15.5H7"/></svg>
+            </button>
+          </div>
+          <div class="btn-row">
+            <button class="add-btn" onclick="addToBOM('decking')">+ Add to BOM</button>
+            <button class="clear-btn" onclick="clearSection('decking')">
+              <svg viewBox="0 0 20 20" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3,6 17,6"/><path d="M8,6V4h4v2"/><rect x="5" y="6" width="10" height="11" rx="1"/></svg>
+              Clear
+            </button>
+          </div>
+        </div>
+      </div>
+      <div class="recent-card" id="recent-decking"></div>
+    </div>
+
+    <!-- HOLLOW SECTIONS -->
+    <div class="calc-panel" id="panel-pipes">
+      <div class="calc-card">
+        <div class="calc-card-header">
+          <div class="sec-badge">09</div>
+          <div class="calc-card-title">Hollow Structural Sections</div>
+        </div>
+        <div class="calc-body">
+          <div class="hss-toggle">
+            <button class="hss-toggle-btn active" id="hs-chs" onclick="setHSType('chs')">CHS</button>
+            <button class="hss-toggle-btn" id="hs-shs" onclick="setHSType('shs')">SHS</button>
+            <button class="hss-toggle-btn" id="hs-rhs" onclick="setHSType('rhs')">RHS</button>
+          </div>
+
+          <!-- CHS -->
+          <div id="hs-chs-section">
+            <div class="pipe-sub-label">Circular Hollow Section</div>
+            <div class="mode-toggle">
+              <button class="mode-btn active" id="pi-mode-nb" onclick="setPipeMode('nb')">By NB</button>
+              <button class="mode-btn" id="pi-mode-od" onclick="setPipeMode('od')">By OD</button>
+            </div>
+            <div id="pi-nb-row" class="field-grid" style="margin-bottom:10px">
+              <div class="field" style="grid-column:span 2">
+                <label>Nominal Bore (NB)</label>
+                <select id="pi-nb" onchange="applyNB();calcPipes()">
+                  <option value="">Select NB</option>
+                  <option value="15">NB 15 (OD 21.3mm)</option>
+                  <option value="20">NB 20 (OD 26.9mm)</option>
+                  <option value="25">NB 25 (OD 33.7mm)</option>
+                  <option value="32">NB 32 (OD 42.4mm)</option>
+                  <option value="40">NB 40 (OD 48.3mm)</option>
+                  <option value="50">NB 50 (OD 60.3mm)</option>
+                  <option value="65">NB 65 (OD 76.1mm)</option>
+                  <option value="80">NB 80 (OD 88.9mm)</option>
+                  <option value="100">NB 100 (OD 114.3mm)</option>
+                  <option value="125">NB 125 (OD 139.7mm)</option>
+                  <option value="150">NB 150 (OD 168.3mm)</option>
+                  <option value="200">NB 200 (OD 219.1mm)</option>
+                  <option value="250">NB 250 (OD 273mm)</option>
+                  <option value="300">NB 300 (OD 323.9mm)</option>
+                  <option value="350">NB 350 (OD 355.6mm)</option>
+                  <option value="400">NB 400 (OD 406.4mm)</option>
+                </select>
+              </div>
+            </div>
+            <div class="field-grid">
+              <div class="field">
+                <label>Outer Diameter (mm)</label>
+                <input type="text" inputmode="none" id="pi-od" placeholder="e.g. 48.3" readonly style="opacity:0.5;cursor:not-allowed">
+              </div>
+              <div class="field">
+                <label>Wall Thickness (mm)</label>
+                <input type="text" inputmode="none" readonly id="pi-wt" placeholder="e.g. 3.2" onclick="openKB(this,'Wall Thickness (mm)')">
+              </div>
+              <div class="field">
+                <label>Length (mtr)</label>
+                <input type="text" inputmode="none" readonly id="pi-len" placeholder="e.g. 6" onclick="openKB(this,'Length (mtr)')">
+              </div>
+              <div class="field">
+                <label>Nos</label>
+                <input type="text" inputmode="none" readonly id="pi-nos" placeholder="e.g. 10" onclick="openKB(this,'Nos')">
+              </div>
+            </div>
+            <div class="wt-info" id="pi-wt-info">
+              <span class="wt-info-label">Wt/Mtr</span>
+              <span class="wt-info-value" id="pi-wt-val">—</span>
+              <span class="wt-info-unit">kg/mtr</span>
+            </div>
+          </div>
+
+          <!-- SHS -->
+          <div id="hs-shs-section" style="display:none">
+            <div class="pipe-sub-label">Square Hollow Section</div>
+            <div class="field-grid">
+              <div class="field">
+                <label>Side (mm)</label>
+                <input type="text" inputmode="none" readonly id="shs-side" placeholder="e.g. 50" onclick="openKB(this,'Side (mm)')">
+              </div>
+              <div class="field">
+                <label>Wall Thickness (mm)</label>
+                <input type="text" inputmode="none" readonly id="shs-thk" placeholder="e.g. 3" onclick="openKB(this,'Wall Thickness (mm)')">
+              </div>
+              <div class="field">
+                <label>Length (mtr)</label>
+                <input type="text" inputmode="none" readonly id="shs-len" placeholder="e.g. 6" onclick="openKB(this,'Length (mtr)')">
+              </div>
+              <div class="field">
+                <label>Nos</label>
+                <input type="text" inputmode="none" readonly id="shs-nos" placeholder="e.g. 10" onclick="openKB(this,'Nos')">
+              </div>
+            </div>
+            <div class="wt-info" id="shs-wt-info">
+              <span class="wt-info-label">Wt/Mtr</span>
+              <span class="wt-info-value" id="shs-wt-val">—</span>
+              <span class="wt-info-unit">kg/mtr</span>
+            </div>
+          </div>
+
+          <!-- RHS -->
+          <div id="hs-rhs-section" style="display:none">
+            <div class="pipe-sub-label">Rectangular Hollow Section</div>
+            <div class="field-grid">
+              <div class="field">
+                <label>Width (mm)</label>
+                <input type="text" inputmode="none" readonly id="rhs-wid" placeholder="e.g. 100" onclick="openKB(this,'Width (mm)')">
+              </div>
+              <div class="field">
+                <label>Height (mm)</label>
+                <input type="text" inputmode="none" readonly id="rhs-hgt" placeholder="e.g. 50" onclick="openKB(this,'Height (mm)')">
+              </div>
+              <div class="field">
+                <label>Wall Thickness (mm)</label>
+                <input type="text" inputmode="none" readonly id="rhs-thk" placeholder="e.g. 3" onclick="openKB(this,'Wall Thickness (mm)')">
+              </div>
+              <div class="field">
+                <label>Length (mtr)</label>
+                <input type="text" inputmode="none" readonly id="rhs-len" placeholder="e.g. 6" onclick="openKB(this,'Length (mtr)')">
+              </div>
+              <div class="field">
+                <label>Nos</label>
+                <input type="text" inputmode="none" readonly id="rhs-nos" placeholder="e.g. 10" onclick="openKB(this,'Nos')">
+              </div>
+            </div>
+            <div class="wt-info" id="rhs-wt-info">
+              <span class="wt-info-label">Wt/Mtr</span>
+              <span class="wt-info-value" id="rhs-wt-val">—</span>
+              <span class="wt-info-unit">kg/mtr</span>
+            </div>
+          </div>
+
+          <div class="formula-row" style="margin-top:10px">
+            <svg viewBox="0 0 16 16" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><circle cx="8" cy="8" r="7"/><line x1="8" y1="7" x2="8" y2="11"/><circle cx="8" cy="5" r="0.5" fill="currentColor"/></svg>
+            <span class="formula-text">Wt/Mtr = (OD−WT)×WT×0.02466 &nbsp;|&nbsp; Total = Wt/Mtr×L×Nos÷1000</span>
+          </div>
+          <div class="result-display">
+            <div>
+              <div class="result-label">Weight</div>
+              <div class="result-value" id="pi-result">—<span class="result-unit">MT</span></div>
+            </div>
+            <button class="copy-btn" onclick="copyResult('pi-result')">
+              <svg viewBox="0 0 20 20" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="7" y="7" width="10" height="11" rx="1.5"/><path d="M13 7V5a1.5 1.5 0 0 0-1.5-1.5h-7A1.5 1.5 0 0 0 3 5v9A1.5 1.5 0 0 0 4.5 15.5H7"/></svg>
+            </button>
+          </div>
+          <div class="btn-row">
+            <button class="add-btn" onclick="addToBOM('pipes')">+ Add to BOM</button>
+            <button class="clear-btn" onclick="clearSection('pipes')">
+              <svg viewBox="0 0 20 20" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3,6 17,6"/><path d="M8,6V4h4v2"/><rect x="5" y="6" width="10" height="11" rx="1"/></svg>
+              Clear
+            </button>
+          </div>
+        </div>
+      </div>
+      <div class="recent-card" id="recent-pipes"></div>
+    </div>
+
+  </div><!-- /scroll-area -->
+
+  <!-- BOTTOM BAR -->
+  <div class="bottom-bar" onclick="openBOMSheet()">
+    <div class="bom-icon-wrap">
+      <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="#f5a623" stroke-width="2" stroke-linecap="round"><rect x="5" y="3" width="14" height="18" rx="2"/><line x1="9" y1="8" x2="15" y2="8"/><line x1="9" y1="12" x2="15" y2="12"/><line x1="9" y1="16" x2="12" y2="16"/></svg>
+    </div>
+    <div class="bom-bar-info">
+      <div class="bom-bar-label" id="bar-label">BOM (0 Items)</div>
+      <div class="bom-bar-sub">View your bill of material</div>
+    </div>
+    <div class="bom-total-wrap">
+      <div class="bom-total-label">Total Weight</div>
+      <div class="bom-total-val" id="bar-total">0.000 MT</div>
+    </div>
+    <div class="bom-bar-chevron">
+      <svg viewBox="0 0 20 20" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="8,5 13,10 8,15"/></svg>
+    </div>
+  </div>
+
+  <!-- BOM SHEET -->
+  <div class="bom-overlay" id="bom-overlay" onclick="closeBOMSheet()"></div>
+  <div class="bom-sheet" id="bom-sheet">
+    <div class="sheet-handle"></div>
+    <div class="sheet-header">
+      <span class="sheet-title">Bill of Materials</span>
+      <span class="sheet-count" id="sheet-count">0</span>
+      <button class="sheet-close" onclick="closeBOMSheet()">✕</button>
+    </div>
+    <div class="sheet-list" id="sheet-list">
+      <div class="sheet-empty">No items added yet.<br>Calculate and add items above.</div>
+    </div>
+    <div class="sheet-footer">
+      <div class="sheet-total">
+        <span class="sheet-total-label">Grand Total</span>
+        <span class="sheet-total-val" id="sheet-grand">0.000 MT</span>
+      </div>
+      <div class="sheet-actions">
+        <button class="sheet-btn s-clear" onclick="clearBOM()">Clear All</button>
+        <button class="sheet-btn s-print" onclick="printBOM()">🖨 Print</button>
+        <button class="sheet-btn s-export" onclick="exportBOM()">Export CSV</button>
       </div>
     </div>
   </div>
 
-</div><!-- /scroll-area -->
+  <!-- CUSTOM KEYBOARD -->
+  <div class="kb-overlay" id="kb-overlay" onclick="closeKB()"></div>
+  <div class="kb-sheet" id="kb-sheet">
+    <div class="kb-header">
+      <span class="kb-field-label" id="kb-label">Value</span>
+      <span class="kb-value-display empty" id="kb-display">0</span>
+      <button class="kb-done" onclick="closeKB()">Done</button>
+    </div>
+    <div class="kb-grid">
+      <button class="kb-key" onclick="kbInput('7')">7</button>
+      <button class="kb-key" onclick="kbInput('8')">8</button>
+      <button class="kb-key" onclick="kbInput('9')">9</button>
+      <button class="kb-key" onclick="kbInput('4')">4</button>
+      <button class="kb-key" onclick="kbInput('5')">5</button>
+      <button class="kb-key" onclick="kbInput('6')">6</button>
+      <button class="kb-key" onclick="kbInput('1')">1</button>
+      <button class="kb-key" onclick="kbInput('2')">2</button>
+      <button class="kb-key" onclick="kbInput('3')">3</button>
+      <button class="kb-key zero" onclick="kbInput('0')">0</button>
+      <button class="kb-key dot" onclick="kbInput('.')">.</button>
+      <button class="kb-key backspace" onclick="kbBackspace()">⌫</button>
+    </div>
+    <div class="kb-safe"></div>
+  </div>
 
-<!-- FAB -->
-<button class="bom-fab" onclick="openBOMDrawer()">
-  📋 BOM <span class="fab-badge" id="fab-count">0</span>
-</button>
-
-<!-- BOM DRAWER -->
-<div class="bom-overlay" id="bom-overlay" onclick="closeBOMDrawer()"></div>
-<div class="bom-drawer" id="bom-drawer">
-  <div class="bom-drawer-handle"></div>
-  <div class="bom-header">
-    <span class="bom-title">Bill of Materials</span>
-    <span class="bom-count" id="bom-count-drawer">0</span>
-    <button class="bom-close" onclick="closeBOMDrawer()">✕</button>
-  </div>
-  <div class="bom-list" id="bom-list-drawer"><div class="bom-empty">No items yet.</div></div>
-  <div class="bom-total">
-    <span class="bom-total-label">Grand Total</span>
-    <span class="bom-total-value" id="bom-grand-drawer">0.000 MT</span>
-  </div>
-  <div class="bom-actions">
-    <button class="bom-btn clear" onclick="clearBOM()">Clear All</button>
-    <button class="bom-btn print" onclick="printBOM()">🖨 Print</button>
-    <button class="bom-btn export" onclick="exportBOM()">Export CSV</button>
-  </div>
-</div>
+</div><!-- /app -->
 
 <script>
-// ── DATA TABLES (unchanged from V6) ──
+// ── DATA TABLES ──
 const CHANNELS = {'75x40':7.14,'100x50':9.56,'125x65':13.1,'150x75':16.8,'175x75':19.6,'200x75a':22.3,'200x75b':24.2,'250x82':34.2,'300x90':36.3,'400x100':50.1};
 const BEAMS    = {'100x50':8.34,'125x70':13.2,'150x75':15,'200x100':25.4,'225x110':31.3,'250x125':37.3,'300x140':46.1,'350x140':52.4,'400x140':61.05,'450x150':72.4,'500x180':86.9,'600x210':123};
 const ANGLES   = {'20x20':{3:0.9,4:1.1},'25x25':{3:1.1,4:1.4,5:1.8,6:2.2},'30x30':{3:1.4,4:1.8,5:2.2,6:2.8},'35x35':{3:1.6,4:2.1,5:2.6,6:3},'40x40':{3:1.8,4:2.4,5:3,6:3.5},'45x45':{3:2.1,4:2.7,5:3.4,6:4},'50x50':{3:2.3,4:3,5:3.8,6:4.5},'65x65':{5:4.9,6:5.8,8:7.7,10:9.4},'75x75':{5:5.7,6:6.8,8:8.9,10:11},'80x80':{6:7.3,8:9.6,10:11.8,12:14},'90x90':{6:8.2,8:10.8,10:13.4,12:15.8},'100x100':{6:9.2,8:12.1,10:14.9,12:17.7},'110x110':{8:13.4,10:16.5,12:19.6,16:24.2},'130x130':{8:15.9,10:19.7,12:23.4,16:28.9},'150x150':{10:22.8,12:27.2,16:35.8,18:39.9,20:44.1},'200x200':{12:36.6,16:48.5,18:54,20:60,25:73.6}};
 const FLATS    = {16:{5:0.6,6:0.8,8:1,10:1.3,12:1.5,16:2,18:2.3,20:2.5,22:2.8,25:3.1},20:{3:0.47,5:0.8,6:0.9,8:1.3,10:1.6,12:1.9,16:2.5,18:2.8,20:3.1,22:3.5,25:3.9},25:{3:0.6,5:1,6:1.2,8:1.6,10:2,12:2.4,16:3.1,18:3.5,20:3.9,22:4.3,25:4.9},32:{3:0.8,5:1.3,6:1.5,8:2,10:2.4,12:3,16:4,18:4.5,20:5,22:5.5,25:6.3},35:{6:1.6,10:2.8},40:{3:0.9,5:1.6,6:1.9,8:2.5,10:3.1,12:3.8,16:5,18:5.7,20:6.3,22:6.9,25:7.8},45:{6:2.1,10:3.5,12:4.2},50:{3:1.2,5:2,6:2.4,8:3.1,10:3.9,12:4.7,16:6.3,18:7.1,20:7.8,22:8.6,25:9.8},63:{5:2.5,6:3,8:4,10:4.9,12:5.9,16:7.9,18:8.9,20:9.9,22:10.9,25:12.4},65:{6:4.1,8:5.1,10:6.1,20:10.2},75:{6:3.5,8:4.7,10:5.9,12:7.1,16:9.4,18:10.6,20:11.8,22:12.9,25:14.7},80:{5:3.1,6:3.8,8:5,10:5.9,12:7.1,16:9.4,18:10.6,20:11.8,22:12.9,25:14.7},100:{5:3.9,6:4.7,8:6.3,10:7.8,12:9.4,16:12.6,18:14,20:15.7,22:17.5,25:19.6},125:{5:4.9,6:5.9,8:7.8,10:9.8,12:11.8,16:15.7,18:17.7,20:19.6,22:21.6,25:25.5},150:{10:11.8,12:14.1,18:18.8,20:23.1,25:29.4},160:{6:6.3,8:7.5,10:12.6,12:15.1,16:20.1,18:22.6,20:25.1,22:27.6,25:31.4},180:{10:17,12:22.6,16:25.4,18:28.3},200:{5:7.8,6:9.4,8:12.6,10:15.7,12:18.8,16:25.1,18:28.3,20:31.4,22:34.5,25:39.2},250:{5:9.8,6:11.3,8:15.7,10:19.6,12:23.6,16:31.4,18:35.3,20:39.2,22:43.2,25:49.1}};
-const DECKING  = {0.8:7.5,0.9:8.5,1.0:9.5,1.2:11.5};
+const DECKING  = {0.8:7.5,0.9:8.5,'1.0':9.5,1.2:11.5};
 const NB_OD    = {15:21.3,20:26.9,25:33.7,32:42.4,40:48.3,50:60.3,65:76.1,80:88.9,100:114.3,125:139.7,150:168.3,200:219.1,250:273,300:323.9,350:355.6,400:406.4};
+
+// ── PER-TAB RECENT ITEMS ──
+const recentItems = { plates:[], channels:[], beams:[], purlin:[], roofing:[], angles:[], flats:[], decking:[], pipes:[] };
+
+// ── BOM ──
+let bomItems = [];
+
+// ── FORMAT ──
+function fmt(n) { return n.toFixed(6).replace(/0+$/,'').replace(/\.$/,''); }
+function fmtShort(n) {
+  if (n >= 10) return n.toFixed(3);
+  if (n >= 1)  return n.toFixed(4);
+  return n.toFixed(5).replace(/0+$/,'').replace(/\.$/,'');
+}
+
+// ── ANIMATED RESULT ──
+const _rafIds = {};
+function setResult(id, val) {
+  const el = document.getElementById(id);
+  if (_rafIds[id]) { cancelAnimationFrame(_rafIds[id]); delete _rafIds[id]; }
+  if (val === null) { el.innerHTML = '—<span class="result-unit">MT</span>'; return; }
+  const start = performance.now(), dur = 380;
+  const step = now => {
+    const t = Math.min((now - start)/dur, 1);
+    const ease = 1 - Math.pow(1-t, 3);
+    el.innerHTML = fmt(val * ease) + '<span class="result-unit"> MT</span>';
+    if (t < 1) _rafIds[id] = requestAnimationFrame(step);
+    else el.innerHTML = fmt(val) + '<span class="result-unit"> MT</span>';
+  };
+  _rafIds[id] = requestAnimationFrame(step);
+}
 
 // ── TOAST ──
 function showToast(msg, type='info') {
-  const icons={success:'✓',error:'✕',info:'◈'};
-  const c=document.getElementById('toastContainer');
-  const t=document.createElement('div');
-  t.className='toast '+type;
-  t.innerHTML=`<span class="toast-icon">${icons[type]||'◈'}</span><span>${msg}</span>`;
-  c.appendChild(t);
+  const icons = {success:'✓', error:'✕', info:'◈'};
+  const wrap = document.getElementById('toastWrap');
+  const t = document.createElement('div');
+  t.className = 'toast ' + type;
+  t.innerHTML = `<span class="toast-icon">${icons[type]||'◈'}</span><span class="toast-msg">${msg}</span>`;
+  wrap.appendChild(t);
   requestAnimationFrame(()=>requestAnimationFrame(()=>t.classList.add('show')));
-  setTimeout(()=>{t.classList.remove('show');setTimeout(()=>t.remove(),400);},2500);
+  setTimeout(()=>{ t.classList.remove('show'); setTimeout(()=>t.remove(),350); },2500);
 }
 
 // ── COPY ──
 function copyResult(id) {
-  const el=document.getElementById(id);
-  const txt=el.textContent.replace('MT','').trim();
-  if(txt==='—'||txt===''){showToast('Nothing to copy','error');return;}
-  if(navigator.clipboard){navigator.clipboard.writeText(txt+' MT').then(()=>showToast('Copied: '+txt+' MT','success')).catch(()=>showToast('Copy failed','error'));}
-  else{showToast(txt+' MT','success');}
+  const el = document.getElementById(id);
+  const txt = el.textContent.replace('MT','').trim();
+  if (txt==='—' || txt==='') { showToast('Nothing to copy','error'); return; }
+  navigator.clipboard.writeText(txt+' MT').then(()=>showToast('Copied: '+txt+' MT','success')).catch(()=>showToast('Copy failed','error'));
 }
 
-// ── RESULT ANIMATION ──
-const _rafIds={};
-function setResult(id,val){
-  const el=document.getElementById(id);
-  if(_rafIds[id]){cancelAnimationFrame(_rafIds[id]);delete _rafIds[id];}
-  if(val===null){el.innerHTML='—<span class="result-unit">MT</span>';return;}
-  const start=performance.now(),dur=380;
-  const step=now=>{
-    const t=Math.min((now-start)/dur,1),e=1-Math.pow(1-t,3);
-    el.innerHTML=fmt(val*e)+'<span class="result-unit"> MT</span>';
-    if(t<1)_rafIds[id]=requestAnimationFrame(step);
-    else el.innerHTML=fmt(val)+'<span class="result-unit"> MT</span>';
-  };
-  _rafIds[id]=requestAnimationFrame(step);
-}
-function fmt(n){return n.toFixed(6).replace(/0+$/,'').replace(/\.$/,'');}
+// ── CUSTOM KEYBOARD ──
+let kbTarget = null;
+let kbStr = '';
+let kbOnChange = null;
 
-// ── INIT DROPDOWNS ──
-function initDropdowns(){
-  const ag=document.getElementById('ag-size');
-  Object.keys(ANGLES).forEach(s=>{const o=document.createElement('option');o.value=s;o.textContent=s.replace('x',' × ');ag.appendChild(o);});
-  const fl=document.getElementById('fl-size');
-  Object.keys(FLATS).forEach(s=>{const o=document.createElement('option');o.value=s;o.textContent=s+' mm';fl.appendChild(o);});
-}
-
-function updateAngleTHK(){
-  const size=document.getElementById('ag-size').value,sel=document.getElementById('ag-thk');
-  sel.innerHTML='<option value="">Select THK</option>';
-  document.getElementById('ag-wt-info').style.display='none';
-  if(!size)return;
-  Object.keys(ANGLES[size]).forEach(t=>{const o=document.createElement('option');o.value=t;o.textContent=t+' mm';sel.appendChild(o);});
-}
-function updateAngleWt(){
-  const size=document.getElementById('ag-size').value,thk=document.getElementById('ag-thk').value,info=document.getElementById('ag-wt-info');
-  if(size&&thk&&ANGLES[size]?.[thk]){document.getElementById('ag-wt-val').textContent=ANGLES[size][thk];info.style.display='inline-flex';}
-  else info.style.display='none';
-}
-function updateFlatTHK(){
-  const size=document.getElementById('fl-size').value,sel=document.getElementById('fl-thk');
-  sel.innerHTML='<option value="">Select THK</option>';
-  document.getElementById('fl-wt-info').style.display='none';
-  if(!size)return;
-  Object.keys(FLATS[size]).forEach(t=>{const o=document.createElement('option');o.value=t;o.textContent=t+' mm';sel.appendChild(o);});
-}
-function updateFlatWt(){
-  const size=document.getElementById('fl-size').value,thk=document.getElementById('fl-thk').value,info=document.getElementById('fl-wt-info');
-  if(size&&thk&&FLATS[size]?.[thk]){document.getElementById('fl-wt-val').textContent=FLATS[size][thk];info.style.display='inline-flex';}
-  else info.style.display='none';
-}
-function updateChannelWt(){
-  const size=document.getElementById('ch-size').value;
-  if(size&&CHANNELS[size]){document.getElementById('ch-wt-val').textContent=CHANNELS[size];document.getElementById('ch-wt-info').style.display='inline-flex';}
-  else document.getElementById('ch-wt-info').style.display='none';
-}
-function updateBeamWt(){
-  const size=document.getElementById('bm-size').value;
-  if(size&&BEAMS[size]){document.getElementById('bm-wt-val').textContent=BEAMS[size];document.getElementById('bm-wt-info').style.display='inline-flex';}
-  else document.getElementById('bm-wt-info').style.display='none';
+function openKB(input, label) {
+  kbTarget = input;
+  kbStr = input.value || '';
+  document.getElementById('kb-label').textContent = label;
+  updateKBDisplay();
+  document.getElementById('kb-overlay').classList.add('open');
+  document.getElementById('kb-sheet').classList.add('open');
+  // scroll field into view above keyboard
+  setTimeout(()=>{
+    const kb = document.getElementById('kb-sheet');
+    const kbH = kb.offsetHeight;
+    const scrollArea = document.getElementById('scrollArea');
+    const rect = input.getBoundingClientRect();
+    const appRect = document.getElementById('app').getBoundingClientRect();
+    const relTop = rect.top - appRect.top;
+    const visibleH = appRect.height - kbH;
+    if (relTop + rect.height > visibleH - 10) {
+      scrollArea.scrollBy({top: (relTop + rect.height) - (visibleH - 20), behavior:'smooth'});
+    }
+  }, 50);
 }
 
-// ── CALCULATORS (identical logic to V6) ──
-function calcPlates(){const t=+document.getElementById('pl-thk').value,w=+document.getElementById('pl-wid').value,l=+document.getElementById('pl-len').value,n=+document.getElementById('pl-nos').value;(t&&w&&l&&n)?setResult('pl-result',t*w*l*n*7.85/1e9):setResult('pl-result',null);}
-function calcChannels(){const s=document.getElementById('ch-size').value,l=+document.getElementById('ch-len').value,n=+document.getElementById('ch-nos').value;(s&&l&&n)?setResult('ch-result',CHANNELS[s]*l*n/1000):setResult('ch-result',null);}
-function calcBeams(){const s=document.getElementById('bm-size').value,l=+document.getElementById('bm-len').value,n=+document.getElementById('bm-nos').value;(s&&l&&n)?setResult('bm-result',BEAMS[s]*l*n/1000):setResult('bm-result',null);}
-function calcPurlin(){const l=+document.getElementById('pu-len').value,n=+document.getElementById('pu-nos').value;(l&&n)?setResult('pu-result',l*5.5*n/1000):setResult('pu-result',null);}
-function calcRoofing(){const t=document.getElementById('rf-type').value,l=+document.getElementById('rf-len').value,n=+document.getElementById('rf-nos').value;(t&&l&&n)?setResult('rf-result',(t==='cc'?4.5:4.35)*l*n/1000):setResult('rf-result',null);}
-function calcAngles(){const s=document.getElementById('ag-size').value,t=document.getElementById('ag-thk').value,l=+document.getElementById('ag-len').value,n=+document.getElementById('ag-nos').value;const w=ANGLES[s]?.[t];(s&&t&&l&&n&&w)?setResult('ag-result',w*l*n/1000):setResult('ag-result',null);}
-function calcFlats(){const s=document.getElementById('fl-size').value,t=document.getElementById('fl-thk').value,l=+document.getElementById('fl-len').value,n=+document.getElementById('fl-nos').value;const w=FLATS[s]?.[t];(s&&t&&l&&n&&w)?setResult('fl-result',w*l*n/1000):setResult('fl-result',null);}
-function calcDecking(){const t=parseFloat(document.getElementById('dk-thk').value),l=+document.getElementById('dk-len').value,n=+document.getElementById('dk-nos').value;const f=DECKING[t];(f&&l&&n)?setResult('dk-result',f*l*n/1000):setResult('dk-result',null);}
-
-// ── HSS ──
-let currentHSType='chs';
-function setHSType(type){
-  currentHSType=type;
-  ['chs','shs','rhs'].forEach(t=>{
-    document.getElementById('hs-'+t+'-section').style.display=t===type?'block':'none';
-    const btn=document.getElementById('hs-'+t);
-    btn.classList.toggle('active',t===type);
-  });
-  setResult('pi-result',null);
-}
-function setPipeMode(mode){
-  const od=document.getElementById('pi-od'),nb=document.getElementById('pi-nb-row');
-  const bNB=document.getElementById('pi-mode-nb'),bOD=document.getElementById('pi-mode-od');
-  if(mode==='nb'){nb.style.display='grid';od.readOnly=true;od.style.opacity='0.5';od.style.cursor='not-allowed';bNB.style.background='var(--accent)';bNB.style.color='#000';bOD.style.background='transparent';bOD.style.color='var(--muted)';}
-  else{nb.style.display='none';od.readOnly=false;od.style.opacity='1';od.style.cursor='auto';od.value='';document.getElementById('pi-nb').value='';bOD.style.background='var(--accent)';bOD.style.color='#000';bNB.style.background='transparent';bNB.style.color='var(--muted)';setResult('pi-result',null);document.getElementById('pi-wt-info').style.display='none';}
-}
-function applyNB(){const nb=document.getElementById('pi-nb').value;document.getElementById('pi-od').value=(nb&&NB_OD[nb])?NB_OD[nb]:'';}
-function calcPipes(){
-  const od=+document.getElementById('pi-od').value,wt=+document.getElementById('pi-wt').value,len=+document.getElementById('pi-len').value,nos=+document.getElementById('pi-nos').value,info=document.getElementById('pi-wt-info');
-  if(!od||!wt||wt>=od/2){setResult('pi-result',null);info.style.display='none';return;}
-  const wtpm=(od-wt)*wt*0.02466;document.getElementById('pi-wt-val').textContent=wtpm.toFixed(4);info.style.display='inline-flex';
-  (len&&nos)?setResult('pi-result',wtpm*len*nos/1000):setResult('pi-result',null);
-}
-function calcSHS(){
-  const s=+document.getElementById('shs-side').value,t=+document.getElementById('shs-thk').value,l=+document.getElementById('shs-len').value,n=+document.getElementById('shs-nos').value,info=document.getElementById('shs-wt-info');
-  if(!s||!t||t>=s/2){setResult('pi-result',null);info.style.display='none';return;}
-  const wtpm=4*t*(s-t)*7.85/1000;document.getElementById('shs-wt-val').textContent=wtpm.toFixed(4);info.style.display='inline-flex';
-  (l&&n)?setResult('pi-result',wtpm*l*n/1000):setResult('pi-result',null);
-}
-function calcRHS(){
-  const w=+document.getElementById('rhs-wid').value,h=+document.getElementById('rhs-hgt').value,t=+document.getElementById('rhs-thk').value,l=+document.getElementById('rhs-len').value,n=+document.getElementById('rhs-nos').value,info=document.getElementById('rhs-wt-info');
-  if(!w||!h||!t||t>=w/2||t>=h/2){setResult('pi-result',null);info.style.display='none';return;}
-  const wtpm=2*t*(w+h-2*t)*7.85/1000;document.getElementById('rhs-wt-val').textContent=wtpm.toFixed(4);info.style.display='inline-flex';
-  (l&&n)?setResult('pi-result',wtpm*l*n/1000):setResult('pi-result',null);
+function closeKB() {
+  document.getElementById('kb-overlay').classList.remove('open');
+  document.getElementById('kb-sheet').classList.remove('open');
+  if (kbTarget) {
+    kbTarget.value = kbStr;
+    kbTarget.dispatchEvent(new Event('input'));
+  }
+  kbTarget = null;
 }
 
-// ── TAB SWITCH ──
-function switchTab(id,btn){
+function kbInput(ch) {
+  if (ch==='.' && kbStr.includes('.')) return;
+  if (kbStr === '0' && ch !== '.') kbStr = ch;
+  else kbStr += ch;
+  if (kbTarget) kbTarget.value = kbStr;
+  updateKBDisplay();
+  triggerCalc();
+}
+
+function kbBackspace() {
+  kbStr = kbStr.slice(0,-1);
+  if (kbTarget) kbTarget.value = kbStr;
+  updateKBDisplay();
+  triggerCalc();
+}
+
+function updateKBDisplay() {
+  const disp = document.getElementById('kb-display');
+  disp.textContent = kbStr || '0';
+  disp.classList.toggle('empty', !kbStr);
+}
+
+function triggerCalc() {
+  if (!kbTarget) return;
+  const id = kbTarget.id;
+  if (id.startsWith('pl-')) calcPlates();
+  else if (id.startsWith('ch-')) calcChannels();
+  else if (id.startsWith('bm-')) calcBeams();
+  else if (id.startsWith('pu-')) calcPurlin();
+  else if (id.startsWith('rf-')) calcRoofing();
+  else if (id.startsWith('ag-')) calcAngles();
+  else if (id.startsWith('fl-')) calcFlats();
+  else if (id.startsWith('dk-')) calcDecking();
+  else if (id.startsWith('pi-')||id.startsWith('shs-')||id.startsWith('rhs-')) {
+    if (currentHSType==='chs') calcPipes();
+    else if (currentHSType==='shs') calcSHS();
+    else calcRHS();
+  }
+}
+
+// ── TABS ──
+function switchTab(id, btn) {
   document.querySelectorAll('.calc-panel').forEach(p=>p.classList.remove('active'));
   document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
   document.getElementById('panel-'+id).classList.add('active');
   btn.classList.add('active');
-  // Scroll to top when switching tabs
-  document.getElementById('scrollArea').scrollTop=0;
+  btn.scrollIntoView({behavior:'smooth', block:'nearest', inline:'center'});
+  document.getElementById('scrollArea').scrollTop = 0;
+}
+
+// ── INIT DROPDOWNS ──
+function initDropdowns() {
+  const agSize = document.getElementById('ag-size');
+  Object.keys(ANGLES).forEach(s=>{ const o=document.createElement('option'); o.value=s; o.textContent=s.replace('x',' × '); agSize.appendChild(o); });
+  const flSize = document.getElementById('fl-size');
+  Object.keys(FLATS).forEach(s=>{ const o=document.createElement('option'); o.value=s; o.textContent=s+' mm'; flSize.appendChild(o); });
+}
+
+function updateAngleTHK() {
+  const size = document.getElementById('ag-size').value;
+  const thkSel = document.getElementById('ag-thk');
+  thkSel.innerHTML = '<option value="">Select THK</option>';
+  hideWtInfo('ag-wt-info');
+  if (!size) return;
+  Object.keys(ANGLES[size]).forEach(t=>{ const o=document.createElement('option'); o.value=t; o.textContent=t+' mm'; thkSel.appendChild(o); });
+}
+function updateAngleWt() {
+  const s=document.getElementById('ag-size').value, t=document.getElementById('ag-thk').value;
+  if (s&&t&&ANGLES[s]?.[t]) { document.getElementById('ag-wt-val').textContent=ANGLES[s][t]; showWtInfo('ag-wt-info'); }
+  else hideWtInfo('ag-wt-info');
+}
+function updateFlatTHK() {
+  const size = document.getElementById('fl-size').value;
+  const thkSel = document.getElementById('fl-thk');
+  thkSel.innerHTML = '<option value="">Select THK</option>';
+  hideWtInfo('fl-wt-info');
+  if (!size) return;
+  Object.keys(FLATS[size]).forEach(t=>{ const o=document.createElement('option'); o.value=t; o.textContent=t+' mm'; thkSel.appendChild(o); });
+}
+function updateFlatWt() {
+  const s=document.getElementById('fl-size').value, t=document.getElementById('fl-thk').value;
+  if (s&&t&&FLATS[s]?.[t]) { document.getElementById('fl-wt-val').textContent=FLATS[s][t]; showWtInfo('fl-wt-info'); }
+  else hideWtInfo('fl-wt-info');
+}
+function updateChannelWt() {
+  const s=document.getElementById('ch-size').value;
+  if (s&&CHANNELS[s]) { document.getElementById('ch-wt-val').textContent=CHANNELS[s]; showWtInfo('ch-wt-info'); }
+  else hideWtInfo('ch-wt-info');
+}
+function updateBeamWt() {
+  const s=document.getElementById('bm-size').value;
+  if (s&&BEAMS[s]) { document.getElementById('bm-wt-val').textContent=BEAMS[s]; showWtInfo('bm-wt-info'); }
+  else hideWtInfo('bm-wt-info');
+}
+function showWtInfo(id) { document.getElementById(id).classList.add('show'); }
+function hideWtInfo(id) { document.getElementById(id).classList.remove('show'); }
+
+// ── CALCULATORS ──
+function calcPlates()  { const t=pf('pl-thk'),w=pf('pl-wid'),l=pf('pl-len'),n=pf('pl-nos'); setResult('pl-result',(isAny(t,w,l,n))?null:t*w*l*n*7.85/1e9); }
+function calcChannels(){ const s=gv('ch-size'),l=pf('ch-len'),n=pf('ch-nos'); setResult('ch-result',(!s||isNaN(l)||isNaN(n))?null:CHANNELS[s]*l*n/1000); }
+function calcBeams()   { const s=gv('bm-size'),l=pf('bm-len'),n=pf('bm-nos'); setResult('bm-result',(!s||isNaN(l)||isNaN(n))?null:BEAMS[s]*l*n/1000); }
+function calcPurlin()  { const l=pf('pu-len'),n=pf('pu-nos'); setResult('pu-result',(isAny(l,n))?null:l*5.5*n/1000); }
+function calcRoofing() { const t=gv('rf-type'),l=pf('rf-len'),n=pf('rf-nos'); setResult('rf-result',(!t||isAny(l,n))?null:(t==='cc'?4.5:4.35)*l*n/1000); }
+function calcAngles()  { const s=gv('ag-size'),t=gv('ag-thk'),l=pf('ag-len'),n=pf('ag-nos'); if(!s||!t||isAny(l,n)){setResult('ag-result',null);return;} const w=ANGLES[s]?.[t]; setResult('ag-result',w?w*l*n/1000:null); }
+function calcFlats()   { const s=gv('fl-size'),t=gv('fl-thk'),l=pf('fl-len'),n=pf('fl-nos'); if(!s||!t||isAny(l,n)){setResult('fl-result',null);return;} const w=FLATS[s]?.[t]; setResult('fl-result',w?w*l*n/1000:null); }
+function calcDecking() { const t=parseFloat(gv('dk-thk')),l=pf('dk-len'),n=pf('dk-nos'); if(isNaN(t)||isAny(l,n)){setResult('dk-result',null);return;} const f=DECKING[t]||DECKING[t+'']||DECKING[String(t)]; setResult('dk-result',f?f*l*n/1000:null); }
+
+function pf(id) { return parseFloat(document.getElementById(id).value); }
+function gv(id) { return document.getElementById(id).value; }
+function isAny(...args) { return args.some(v=>isNaN(v)); }
+
+// ── HSS TYPE ──
+let currentHSType = 'chs';
+function setHSType(type) {
+  currentHSType = type;
+  ['chs','shs','rhs'].forEach(t=>{
+    document.getElementById('hs-'+t+'-section').style.display = t===type?'block':'none';
+    const btn=document.getElementById('hs-'+t);
+    btn.classList.toggle('active', t===type);
+  });
+  setResult('pi-result',null);
+}
+function setPipeMode(mode) {
+  const odIn=document.getElementById('pi-od'), nbRow=document.getElementById('pi-nb-row');
+  const btnNB=document.getElementById('pi-mode-nb'), btnOD=document.getElementById('pi-mode-od');
+  if (mode==='nb') {
+    nbRow.style.display='grid'; odIn.readOnly=true; odIn.style.opacity='0.5'; odIn.style.cursor='not-allowed';
+    btnNB.classList.add('active'); btnOD.classList.remove('active');
+  } else {
+    nbRow.style.display='none'; odIn.readOnly=false; odIn.style.opacity='1'; odIn.style.cursor='auto'; odIn.value=''; document.getElementById('pi-nb').value='';
+    odIn.onclick = ()=>openKB(odIn,'Outer Diameter (mm)');
+    btnOD.classList.add('active'); btnNB.classList.remove('active');
+    setResult('pi-result',null); hideWtInfo('pi-wt-info');
+  }
+}
+function applyNB() { const nb=gv('pi-nb'); document.getElementById('pi-od').value=(nb&&NB_OD[nb])?NB_OD[nb]:''; }
+function calcPipes() {
+  const od=pf('pi-od'),wt=pf('pi-wt'),len=pf('pi-len'),nos=pf('pi-nos');
+  if(isNaN(od)||isNaN(wt)||wt>=od/2){setResult('pi-result',null);hideWtInfo('pi-wt-info');return;}
+  const wtpm=(od-wt)*wt*0.02466; document.getElementById('pi-wt-val').textContent=wtpm.toFixed(4); showWtInfo('pi-wt-info');
+  if(isNaN(len)||isNaN(nos)){setResult('pi-result',null);return;}
+  setResult('pi-result',wtpm*len*nos/1000);
+}
+function calcSHS() {
+  const side=pf('shs-side'),thk=pf('shs-thk'),len=pf('shs-len'),nos=pf('shs-nos');
+  if(isNaN(side)||isNaN(thk)||thk<=0||thk>=side/2){setResult('pi-result',null);hideWtInfo('shs-wt-info');return;}
+  const wtpm=4*thk*(side-thk)*7.85/1000; document.getElementById('shs-wt-val').textContent=wtpm.toFixed(4); showWtInfo('shs-wt-info');
+  if(isNaN(len)||isNaN(nos)){setResult('pi-result',null);return;}
+  setResult('pi-result',wtpm*len*nos/1000);
+}
+function calcRHS() {
+  const wid=pf('rhs-wid'),hgt=pf('rhs-hgt'),thk=pf('rhs-thk'),len=pf('rhs-len'),nos=pf('rhs-nos');
+  if(isNaN(wid)||isNaN(hgt)||isNaN(thk)||thk<=0||thk>=wid/2||thk>=hgt/2){setResult('pi-result',null);hideWtInfo('rhs-wt-info');return;}
+  const wtpm=2*thk*(wid+hgt-2*thk)*7.85/1000; document.getElementById('rhs-wt-val').textContent=wtpm.toFixed(4); showWtInfo('rhs-wt-info');
+  if(isNaN(len)||isNaN(nos)){setResult('pi-result',null);return;}
+  setResult('pi-result',wtpm*len*nos/1000);
+}
+
+// ── CLEAR SECTION ──
+const SECTION_FIELDS = {
+  plates:['pl-thk','pl-wid','pl-len','pl-nos'],
+  channels:['ch-size','ch-len','ch-nos'],
+  beams:['bm-size','bm-len','bm-nos'],
+  purlin:['pu-len','pu-nos'],
+  roofing:['rf-type','rf-len','rf-nos'],
+  angles:['ag-size','ag-thk','ag-len','ag-nos'],
+  flats:['fl-size','fl-thk','fl-len','fl-nos'],
+  decking:['dk-thk','dk-len','dk-nos'],
+  pipes:['pi-nb','pi-od','pi-wt','pi-len','pi-nos','shs-side','shs-thk','shs-len','shs-nos','rhs-wid','rhs-hgt','rhs-thk','rhs-len','rhs-nos']
+};
+const RESULT_IDS = {plates:'pl-result',channels:'ch-result',beams:'bm-result',purlin:'pu-result',roofing:'rf-result',angles:'ag-result',flats:'fl-result',decking:'dk-result',pipes:'pi-result'};
+const WT_INFO_IDS = {channels:'ch-wt-info',beams:'bm-wt-info',angles:'ag-wt-info',flats:'fl-wt-info',pipes:'pi-wt-info'};
+
+function clearSection(section) {
+  (SECTION_FIELDS[section]||[]).forEach(id=>{ const el=document.getElementById(id); if(!el)return; el.value=''; });
+  if(section==='angles') document.getElementById('ag-thk').innerHTML='<option value="">Select THK</option>';
+  if(section==='flats') document.getElementById('fl-thk').innerHTML='<option value="">Select THK</option>';
+  if(section==='pipes'){
+    document.getElementById('pi-od').readOnly=true; document.getElementById('pi-od').style.opacity='0.5';
+    ['shs-wt-info','rhs-wt-info'].forEach(id=>hideWtInfo(id));
+  }
+  const wi=WT_INFO_IDS[section]; if(wi) hideWtInfo(wi);
+  setResult(RESULT_IDS[section],null);
 }
 
 // ── BOM ──
-let bomItems=[];
-function getResultValue(id){const el=document.getElementById(id);if(!el)return null;const txt=el.textContent.replace('MT','').trim();return(txt==='—'||txt==='')?null:parseFloat(txt);}
+function getResultValue(id) {
+  const el=document.getElementById(id); if(!el) return null;
+  const txt=el.textContent.replace('MT','').trim();
+  if(txt==='—'||txt==='') return null;
+  return parseFloat(txt);
+}
 
-function getBOMEntry(section){
-  let name='',detail='',value=null,fields={};
+function getBOMEntry(section) {
+  let name='', detail='', value=null, fields={};
   switch(section){
-    case 'plates':{const t=document.getElementById('pl-thk').value,w=document.getElementById('pl-wid').value,l=document.getElementById('pl-len').value,n=document.getElementById('pl-nos').value;value=getResultValue('pl-result');name='MS Plate';detail=`${t}×${w}×${l}mm | Nos: ${n}`;fields={spec:'-',thk:t,widthMM:w,heightMM:l,lenMtr:'-',nos:n,wtPerMtr:'-'};break;}
-    case 'channels':{const se=document.getElementById('ch-size'),sk=se.value,st=se.options[se.selectedIndex].text,l=document.getElementById('ch-len').value,n=document.getElementById('ch-nos').value;value=getResultValue('ch-result');name='MS Channel';detail=`${st} | ${l}Mtr | Nos: ${n}`;fields={spec:st,thk:'-',widthMM:'-',heightMM:'-',lenMtr:l,nos:n,wtPerMtr:sk?CHANNELS[sk]:'-'};break;}
-    case 'beams':{const se=document.getElementById('bm-size'),sk=se.value,st=se.options[se.selectedIndex].text,l=document.getElementById('bm-len').value,n=document.getElementById('bm-nos').value;value=getResultValue('bm-result');name='RS Joist/Beam';detail=`${st} | ${l}Mtr | Nos: ${n}`;fields={spec:st,thk:'-',widthMM:'-',heightMM:'-',lenMtr:l,nos:n,wtPerMtr:sk?BEAMS[sk]:'-'};break;}
-    case 'purlin':{const l=document.getElementById('pu-len').value,n=document.getElementById('pu-nos').value;value=getResultValue('pu-result');name='Purlin';detail=`${l}Mtr | Nos: ${n}`;fields={spec:'2mm×200×60×60×20',thk:2,widthMM:'-',heightMM:'-',lenMtr:l,nos:n,wtPerMtr:5.5};break;}
-    case 'roofing':{const te=document.getElementById('rf-type'),tk=te.value,tt=te.options[te.selectedIndex].text,l=document.getElementById('rf-len').value,n=document.getElementById('rf-nos').value;value=getResultValue('rf-result');name='Roofing Sheet';detail=`${tt} | ${l}Mtr | Nos: ${n}`;fields={spec:tt,thk:'-',widthMM:'-',heightMM:'-',lenMtr:l,nos:n,wtPerMtr:tk==='cc'?4.5:4.35};break;}
-    case 'angles':{const s=document.getElementById('ag-size').value,t=document.getElementById('ag-thk').value,l=document.getElementById('ag-len').value,n=document.getElementById('ag-nos').value;value=getResultValue('ag-result');name='MS Angle';detail=`${s}mm × ${t}mm | ${l}Mtr | Nos: ${n}`;fields={spec:s+'mm',thk:t,widthMM:'-',heightMM:'-',lenMtr:l,nos:n,wtPerMtr:(s&&t&&ANGLES[s])?ANGLES[s][t]||'-':'-'};break;}
-    case 'flats':{const s=document.getElementById('fl-size').value,t=document.getElementById('fl-thk').value,l=document.getElementById('fl-len').value,n=document.getElementById('fl-nos').value;value=getResultValue('fl-result');name='MS Flat';detail=`${s}mm × ${t}mm | ${l}Mtr | Nos: ${n}`;fields={spec:s+'mm',thk:t,widthMM:'-',heightMM:'-',lenMtr:l,nos:n,wtPerMtr:(s&&t&&FLATS[s])?FLATS[s][t]||'-':'-'};break;}
-    case 'decking':{const t=document.getElementById('dk-thk').value,l=document.getElementById('dk-len').value,n=document.getElementById('dk-nos').value;value=getResultValue('dk-result');name='Decking Sheet';detail=`${t}mm THK | ${l}Mtr | Nos: ${n}`;fields={spec:'Floor Decking',thk:t,widthMM:'-',heightMM:'-',lenMtr:l,nos:n,wtPerMtr:DECKING[parseFloat(t)]||'-'};break;}
-    case 'pipes':{
-      const ht=currentHSType||'chs';
-      if(ht==='chs'){const od=document.getElementById('pi-od').value,wt=document.getElementById('pi-wt').value,l=document.getElementById('pi-len').value,n=document.getElementById('pi-nos').value,nb=document.getElementById('pi-nb').value;value=getResultValue('pi-result');name='CHS';detail=nb?`NB ${nb} (OD ${od}mm) | WT:${wt}mm | ${l}Mtr | Nos:${n}`:`OD:${od}mm | WT:${wt}mm | ${l}Mtr | Nos:${n}`;const od_f=+od,wt_f=+wt;fields={spec:nb?`NB${nb}/OD${od}mm`:`OD${od}mm`,thk:wt,widthMM:od,heightMM:'-',lenMtr:l,nos:n,wtPerMtr:(!isNaN(od_f)&&!isNaN(wt_f))?+((od_f-wt_f)*wt_f*0.02466).toFixed(4):'-'};}
-      else if(ht==='shs'){const s=document.getElementById('shs-side').value,t=document.getElementById('shs-thk').value,l=document.getElementById('shs-len').value,n=document.getElementById('shs-nos').value;value=getResultValue('pi-result');name='SHS';detail=`${s}×${s}mm | THK:${t}mm | ${l}Mtr | Nos:${n}`;const sv=+s,tv=+t;fields={spec:`${s}×${s}mm`,thk:t,widthMM:s,heightMM:'-',lenMtr:l,nos:n,wtPerMtr:(!isNaN(sv)&&!isNaN(tv))?+(4*tv*(sv-tv)*7.85/1000).toFixed(4):'-'};}
-      else{const w=document.getElementById('rhs-wid').value,h=document.getElementById('rhs-hgt').value,t=document.getElementById('rhs-thk').value,l=document.getElementById('rhs-len').value,n=document.getElementById('rhs-nos').value;value=getResultValue('pi-result');name='RHS';detail=`${w}×${h}mm | THK:${t}mm | ${l}Mtr | Nos:${n}`;const wv=+w,hv=+h,tv=+t;fields={spec:`${w}×${h}mm`,thk:t,widthMM:w,heightMM:h,lenMtr:l,nos:n,wtPerMtr:(!isNaN(wv)&&!isNaN(hv)&&!isNaN(tv))?+(2*tv*(wv+hv-2*tv)*7.85/1000).toFixed(4):'-'};}
+    case 'plates':{ const thk=gv('pl-thk'),wid=gv('pl-wid'),len=gv('pl-len'),nos=gv('pl-nos'); value=getResultValue('pl-result'); name='MS Plate '+thk+'mm'; detail=wid+'×'+len+'mm × '+nos+' NOS'; fields={spec:'-',thk,widthMM:wid,heightMM:len,lenMtr:'-',nos,wtPerMtr:'-'}; break; }
+    case 'channels':{ const sEl=document.getElementById('ch-size'),sk=sEl.value,st=sEl.options[sEl.selectedIndex].text,len=gv('ch-len'),nos=gv('ch-nos'); value=getResultValue('ch-result'); name='MS Channel'; detail=st+' | '+len+'Mtr | Nos: '+nos; fields={spec:st,thk:'-',widthMM:'-',heightMM:'-',lenMtr:len,nos,wtPerMtr:sk?CHANNELS[sk]:'-'}; break; }
+    case 'beams':{ const sEl=document.getElementById('bm-size'),sk=sEl.value,st=sEl.options[sEl.selectedIndex].text,len=gv('bm-len'),nos=gv('bm-nos'); value=getResultValue('bm-result'); name='RS Joist / Beam'; detail=st+' | '+len+'Mtr | Nos: '+nos; fields={spec:st,thk:'-',widthMM:'-',heightMM:'-',lenMtr:len,nos,wtPerMtr:sk?BEAMS[sk]:'-'}; break; }
+    case 'purlin':{ const len=gv('pu-len'),nos=gv('pu-nos'); value=getResultValue('pu-result'); name='Purlin'; detail=len+'Mtr | Nos: '+nos; fields={spec:'2mm×200×60×60×20',thk:2,widthMM:'-',heightMM:'-',lenMtr:len,nos,wtPerMtr:5.5}; break; }
+    case 'roofing':{ const tEl=document.getElementById('rf-type'),tk=tEl.value,tt=tEl.options[tEl.selectedIndex].text,len=gv('rf-len'),nos=gv('rf-nos'); value=getResultValue('rf-result'); name='Roofing Sheet'; detail=tt+' | '+len+'Mtr | Nos: '+nos; fields={spec:tt,thk:'-',widthMM:'-',heightMM:'-',lenMtr:len,nos,wtPerMtr:tk==='cc'?4.5:4.35}; break; }
+    case 'angles':{ const sz=gv('ag-size'),thk=gv('ag-thk'),len=gv('ag-len'),nos=gv('ag-nos'); value=getResultValue('ag-result'); name='MS Angle'; detail=sz+'mm × '+thk+'mm | '+len+'Mtr | Nos: '+nos; const w=(sz&&thk&&ANGLES[sz])?(ANGLES[sz][thk]||'-'):'-'; fields={spec:sz?sz+'mm':'-',thk,widthMM:'-',heightMM:'-',lenMtr:len,nos,wtPerMtr:w}; break; }
+    case 'flats':{ const sz=gv('fl-size'),thk=gv('fl-thk'),len=gv('fl-len'),nos=gv('fl-nos'); value=getResultValue('fl-result'); name='MS Flat'; detail=sz+'mm × '+thk+'mm | '+len+'Mtr | Nos: '+nos; const w=(sz&&thk&&FLATS[sz])?(FLATS[sz][thk]||'-'):'-'; fields={spec:sz?sz+'mm':'-',thk,widthMM:'-',heightMM:'-',lenMtr:len,nos,wtPerMtr:w}; break; }
+    case 'decking':{ const thk=gv('dk-thk'),len=gv('dk-len'),nos=gv('dk-nos'); value=getResultValue('dk-result'); name='Decking Sheet'; detail=thk+'mm | '+len+'Mtr | Nos: '+nos; const f=DECKING[parseFloat(thk)]||'-'; fields={spec:'Floor Decking',thk,widthMM:'-',heightMM:'-',lenMtr:len,nos,wtPerMtr:f}; break; }
+    case 'pipes':{ const ht=currentHSType||'chs';
+      if(ht==='chs'){ const od=gv('pi-od'),wt=gv('pi-wt'),len=gv('pi-len'),nos=gv('pi-nos'),nb=gv('pi-nb'); value=getResultValue('pi-result'); name='CHS (Circular Hollow)'; detail=nb?'NB '+nb+' (OD '+od+'mm) | WT: '+wt+'mm | '+len+'Mtr | Nos: '+nos:'OD: '+od+'mm | WT: '+wt+'mm | '+len+'Mtr | Nos: '+nos; const od_f=parseFloat(od),wt_f=parseFloat(wt); const chsW=(!isNaN(od_f)&&!isNaN(wt_f))?+(Math.PI*(od_f-wt_f)*wt_f*7.85/1000).toFixed(4):'-'; fields={spec:nb?'NB '+nb+'/OD '+od+'mm':'OD '+od+'mm',thk:wt,widthMM:od,heightMM:'-',lenMtr:len,nos,wtPerMtr:chsW}; }
+      else if(ht==='shs'){ const side=gv('shs-side'),thk=gv('shs-thk'),len=gv('shs-len'),nos=gv('shs-nos'); value=getResultValue('pi-result'); name='SHS (Square Hollow)'; detail=side+'×'+side+'mm | THK: '+thk+'mm | '+len+'Mtr | Nos: '+nos; const s=parseFloat(side),t=parseFloat(thk); const shsW=(!isNaN(s)&&!isNaN(t))?+(4*t*(s-t)*7.85/1000).toFixed(4):'-'; fields={spec:side+'×'+side+'mm',thk,widthMM:side,heightMM:'-',lenMtr:len,nos,wtPerMtr:shsW}; }
+      else{ const wid=gv('rhs-wid'),hgt=gv('rhs-hgt'),thk=gv('rhs-thk'),len=gv('rhs-len'),nos=gv('rhs-nos'); value=getResultValue('pi-result'); name='RHS (Rectangular Hollow)'; detail=wid+'×'+hgt+'mm | THK: '+thk+'mm | '+len+'Mtr | Nos: '+nos; const w=parseFloat(wid),h=parseFloat(hgt),t=parseFloat(thk); const rhsW=(!isNaN(w)&&!isNaN(h)&&!isNaN(t))?+(2*t*(w+h-2*t)*7.85/1000).toFixed(4):'-'; fields={spec:wid+'×'+hgt+'mm',thk,widthMM:wid,heightMM:hgt,lenMtr:len,nos,wtPerMtr:rhsW}; }
       break;
     }
   }
-  return{name,detail,value,fields};
+  return { name, detail, value, fields };
 }
 
-function addToBOM(section){
-  const entry=getBOMEntry(section);
-  if(!entry.value){showToast('Fill all fields first','error');return;}
-  bomItems.push({id:Date.now(),...entry});
+function addToBOM(section) {
+  const entry = getBOMEntry(section);
+  if (!entry.value) { showToast('Fill all fields first','error'); return; }
+  const item = { id:Date.now(), section, ...entry };
+  bomItems.push(item);
+  // add to per-tab recent
+  const ri = recentItems[section];
+  ri.unshift(item);
+  if (ri.length > 5) ri.pop();
+  renderRecent(section);
   renderBOM();
   showToast(entry.name+' added to BOM','success');
 }
 
-function renderBOM(){
-  const count=document.getElementById('bom-count-drawer'),fab=document.getElementById('fab-count');
-  count.textContent=bomItems.length;fab.textContent=bomItems.length;
-  const html=bomItems.length===0?'<div class="bom-empty">No items yet.</div>':bomItems.map(item=>`
-    <div class="bom-item">
-      <div><div class="bom-item-name">${item.name}</div><div class="bom-item-detail">${item.detail}</div></div>
-      <div style="display:flex;align-items:center;gap:4px">
-        <div class="bom-item-qty">${fmt(item.value)} MT</div>
-        <button class="bom-item-remove" onclick="removeBOM(${item.id})">✕</button>
+// ── RECENT ──
+function renderRecent(section) {
+  const el = document.getElementById('recent-'+section);
+  const items = recentItems[section];
+  if (!items.length) { el.innerHTML=''; return; }
+  el.innerHTML = `
+    <div class="recent-header">
+      <span class="recent-title">Recent Items</span>
+      <button class="view-all-btn" onclick="openBOMSheet()">View All</button>
+    </div>
+    ${items.map((item,i)=>`
+      <div class="recent-item">
+        <div class="item-num">${String(i+1).padStart(2,'0')}</div>
+        <div class="item-info">
+          <div class="item-name">${item.name}</div>
+          <div class="item-detail">${item.detail}</div>
+        </div>
+        <div class="item-weight">${fmtShort(item.value)} <span class="wt-unit">MT</span></div>
+        <button class="item-menu-btn" onclick="removeBOMById(${item.id})">✕</button>
       </div>
-    </div>`).join('');
-  document.getElementById('bom-list-drawer').innerHTML=html;
-  const total=bomItems.reduce((s,i)=>s+i.value,0);
-  document.getElementById('bom-grand-drawer').textContent=bomItems.length?fmt(total)+' MT':'0.000 MT';
+    `).join('')}
+  `;
 }
 
-function removeBOM(id){bomItems=bomItems.filter(i=>i.id!==id);renderBOM();showToast('Item removed','info');}
-function clearBOM(){if(bomItems.length===0)return;if(confirm('Clear all BOM items?')){bomItems=[];renderBOM();showToast('BOM cleared','info');}}
+// ── BOM SHEET ──
+function renderBOM() {
+  const total = bomItems.reduce((s,i)=>s+(i.value||0),0);
+  const totalStr = bomItems.length ? fmt(total)+' MT' : '0.000 MT';
 
-function printBOM(){
-  if(bomItems.length===0){showToast('No items to print','error');return;}
-  const total=bomItems.reduce((s,i)=>s+(i.value||0),0);
-  const rows=bomItems.map((item,i)=>`<tr><td>${i+1}</td><td><strong>${item.name}</strong></td><td>${item.detail}</td><td class="num">${(item.value*1000).toFixed(3)}</td><td class="num"><strong>${fmt(item.value)}</strong></td></tr>`).join('');
-  const html=`<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Steel BOM</title><style>body{font-family:Arial,sans-serif;font-size:12px;margin:24px}table{width:100%;border-collapse:collapse}th{background:#1a1d27;color:#f5a623;padding:8px;text-align:left;font-size:11px;text-transform:uppercase}td{padding:7px 10px;border-bottom:1px solid #e8e8e8}.num{text-align:right;font-family:monospace}.total-row td{background:#fff8e8;border-top:2px solid #f5a623;font-weight:bold}</style></head><body><h2>Steel Weight — Bill of Materials</h2><p>${new Date().toLocaleString('en-IN')} | Items: ${bomItems.length} | Total: ${fmt(total)} MT</p><table><thead><tr><th>#</th><th>Material</th><th>Description</th><th style="text-align:right">Weight (kg)</th><th style="text-align:right">Weight (MT)</th></tr></thead><tbody>${rows}<tr class="total-row"><td colspan="3" style="text-align:right">GRAND TOTAL</td><td class="num">${(total*1000).toFixed(3)}</td><td class="num">${fmt(total)}</td></tr></tbody></table><script>window.onload=()=>window.print()<\/script></body></html>`;
-  const w=window.open('','_blank');w.document.write(html);w.document.close();
+  document.getElementById('sheet-count').textContent = bomItems.length;
+  document.getElementById('sheet-grand').textContent = totalStr;
+  document.getElementById('bar-label').textContent = 'BOM ('+bomItems.length+' Item'+(bomItems.length!==1?'s':'')+')';
+  document.getElementById('bar-total').textContent = bomItems.length ? fmtShort(total)+' MT' : '0.000 MT';
+
+  const list = document.getElementById('sheet-list');
+  if (!bomItems.length) {
+    list.innerHTML = '<div class="sheet-empty">No items added yet.<br>Calculate and add items above.</div>';
+    return;
+  }
+  list.innerHTML = bomItems.map((item,i)=>`
+    <div class="sheet-item">
+      <div class="sheet-item-num">${String(i+1).padStart(2,'0')}</div>
+      <div class="sheet-item-info">
+        <div class="sheet-item-name">${item.name}</div>
+        <div class="sheet-item-detail">${item.detail}</div>
+      </div>
+      <div class="sheet-item-wt">${fmtShort(item.value)} <span class="wu">MT</span></div>
+      <button class="sheet-item-rm" onclick="removeBOMById(${item.id})">✕</button>
+    </div>
+  `).join('');
 }
 
-function exportBOM(){
-  if(bomItems.length===0){showToast('No items to export','error');return;}
-  const h=['#','Material','Size/Spec','THK','Width(mm)','Height(mm)','Len(mtr)','Nos','Wt/Mtr(kg)','Weight(kg)','Weight(MT)'];
-  const esc=v=>{const s=String(v??'-');return(s.includes(',')||s.includes('"'))?'"'+s.replace(/"/g,'""')+'"':s;};
-  let csv=h.join(',')+'\n';
-  bomItems.forEach((item,i)=>{const f=item.fields||{},wMT=item.value,wKG=wMT!=null?+(wMT*1000).toFixed(3):'-';csv+=[i+1,item.name,f.spec??'-',f.thk??'-',f.widthMM??'-',f.heightMM??'-',f.lenMtr??'-',f.nos??'-',f.wtPerMtr??'-',wKG,wMT!=null?fmt(wMT):'-'].map(esc).join(',')+'\n';});
+function removeBOMById(id) {
+  const item = bomItems.find(i=>i.id===id);
+  bomItems = bomItems.filter(i=>i.id!==id);
+  if (item) {
+    const ri = recentItems[item.section];
+    const idx = ri.findIndex(r=>r.id===id);
+    if (idx>=0) ri.splice(idx,1);
+    renderRecent(item.section);
+  }
+  renderBOM();
+  showToast('Item removed','info');
+}
+
+function clearBOM() {
+  if (!bomItems.length) return;
+  if (confirm('Clear all BOM items?')) {
+    bomItems = [];
+    Object.keys(recentItems).forEach(s=>{ recentItems[s]=[]; renderRecent(s); });
+    renderBOM();
+    showToast('BOM cleared','info');
+  }
+}
+
+function openBOMSheet() {
+  document.getElementById('bom-overlay').classList.add('open');
+  document.getElementById('bom-sheet').classList.add('open');
+}
+function closeBOMSheet() {
+  document.getElementById('bom-overlay').classList.remove('open');
+  document.getElementById('bom-sheet').classList.remove('open');
+}
+
+// ── PRINT ──
+function printBOM() {
+  if (!bomItems.length) { showToast('No items to print','error'); return; }
+  const total = bomItems.reduce((s,i)=>s+(i.value||0),0);
+  const rows = bomItems.map((item,i)=>`<tr><td>${i+1}</td><td><strong>${item.name}</strong></td><td>${item.detail}</td><td class="num">${(item.value*1000).toFixed(3)}</td><td class="num"><strong>${fmt(item.value)}</strong></td></tr>`).join('');
+  const html = `<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Steel BOM</title><style>body{font-family:Arial,sans-serif;font-size:12px;color:#222;margin:24px;}h2{font-size:18px;margin-bottom:4px;}.meta{color:#666;font-size:11px;margin-bottom:16px;}table{width:100%;border-collapse:collapse;}th{background:#1a1d27;color:#f5a623;font-size:11px;letter-spacing:0.5px;text-transform:uppercase;padding:8px 10px;text-align:left;}td{padding:7px 10px;border-bottom:1px solid #e8e8e8;vertical-align:top;}tr:nth-child(even)td{background:#f8f8f8;}.num{text-align:right;font-family:monospace;white-space:nowrap;}.total-row td{background:#fff8e8;border-top:2px solid #f5a623;font-weight:bold;}@media print{body{margin:0;}}</style></head><body><h2>Steel Weight — Bill of Materials</h2><div class="meta">Generated: ${new Date().toLocaleString('en-IN')} | Items: ${bomItems.length} | Total: ${fmt(total)} MT</div><table><thead><tr><th>#</th><th>Material</th><th>Description</th><th style="text-align:right">Weight (kg)</th><th style="text-align:right">Weight (MT)</th></tr></thead><tbody>${rows}<tr class="total-row"><td colspan="3" style="text-align:right">GRAND TOTAL</td><td class="num">${(total*1000).toFixed(3)}</td><td class="num">${fmt(total)}</td></tr></tbody></table><script>window.onload=()=>{window.print();}<\/script></body></html>`;
+  const w=window.open('','_blank'); w.document.write(html); w.document.close();
+}
+
+// ── EXPORT CSV ──
+function exportBOM() {
+  if (!bomItems.length) { showToast('No items to export','error'); return; }
+  const headers=['#','Material','Size/Spec','THK(mm)','Width(mm)','Height(mm)','Length(mtr)','Nos','Wt/Mtr(kg)','Weight(kg)','Weight(MT)'];
+  const esc=v=>{ const s=String(v??'-'); return (s.includes(',')||s.includes('"')||s.includes('\n'))?'"'+s.replace(/"/g,'""')+'"':s; };
+  let csv=headers.join(',')+'\n';
+  bomItems.forEach((item,i)=>{ const f=item.fields||{},wMT=item.value,wKG=wMT!=null?+(wMT*1000).toFixed(3):'-'; csv+=[i+1,item.name,f.spec??'-',f.thk??'-',f.widthMM??'-',f.heightMM??'-',f.lenMtr??'-',f.nos??'-',f.wtPerMtr??'-',wKG,wMT!=null?fmt(wMT):'-'].map(esc).join(',')+'\n'; });
   const total=bomItems.reduce((s,i)=>s+(i.value||0),0);
   csv+=['','','','','','','','','GRAND TOTAL',+(total*1000).toFixed(3),fmt(total)].map(esc).join(',')+'\n';
   const blob=new Blob(['\uFEFF'+csv],{type:'text/csv;charset=utf-8;'});
   const url=URL.createObjectURL(blob);
-  const a=document.createElement('a');a.href=url;a.download='steel_bom_'+new Date().toISOString().slice(0,10)+'.csv';a.click();
+  const a=document.createElement('a'); a.href=url; a.download='steel_bom_'+new Date().toISOString().slice(0,10)+'.csv'; a.click();
   setTimeout(()=>URL.revokeObjectURL(url),1000);
   showToast('CSV exported','success');
-}
-
-// ── CLEAR ──
-const SECTION_FIELDS={plates:['pl-thk','pl-wid','pl-len','pl-nos'],channels:['ch-size','ch-len','ch-nos'],beams:['bm-size','bm-len','bm-nos'],purlin:['pu-len','pu-nos'],roofing:['rf-type','rf-len','rf-nos'],angles:['ag-size','ag-thk','ag-len','ag-nos'],flats:['fl-size','fl-thk','fl-len','fl-nos'],decking:['dk-thk','dk-len','dk-nos'],pipes:['pi-nb','pi-od','pi-wt','pi-len','pi-nos','shs-side','shs-thk','shs-len','shs-nos','rhs-wid','rhs-hgt','rhs-thk','rhs-len','rhs-nos']};
-const RESULT_IDS={plates:'pl-result',channels:'ch-result',beams:'bm-result',purlin:'pu-result',roofing:'rf-result',angles:'ag-result',flats:'fl-result',decking:'dk-result',pipes:'pi-result'};
-const WT_INFO_IDS={channels:'ch-wt-info',beams:'bm-wt-info',angles:'ag-wt-info',flats:'fl-wt-info',pipes:'pi-wt-info'};
-function clearSection(section){
-  (SECTION_FIELDS[section]||[]).forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
-  if(section==='angles')document.getElementById('ag-thk').innerHTML='<option value="">Select THK</option>';
-  if(section==='flats')document.getElementById('fl-thk').innerHTML='<option value="">Select THK</option>';
-  if(section==='pipes'){document.getElementById('pi-od').readOnly=true;document.getElementById('pi-od').style.opacity='0.5';['shs-wt-info','rhs-wt-info'].forEach(id=>{const el=document.getElementById(id);if(el)el.style.display='none';});}
-  const wi=WT_INFO_IDS[section];if(wi){const el=document.getElementById(wi);if(el)el.style.display='none';}
-  setResult(RESULT_IDS[section],null);
-}
-
-// ── DRAWER ──
-function openBOMDrawer(){document.getElementById('bom-overlay').classList.add('open');document.getElementById('bom-drawer').classList.add('open');}
-function closeBOMDrawer(){document.getElementById('bom-overlay').classList.remove('open');document.getElementById('bom-drawer').classList.remove('open');}
-
-// ── KEYBOARD RESIZE FIX ──
-// When Android keyboard pops, the viewport shrinks.
-// We listen and ensure the scroll area fills the remaining space.
-if(window.visualViewport){
-  window.visualViewport.addEventListener('resize',()=>{
-    const sa=document.getElementById('scrollArea');
-    // Allow native resizing to do its thing — body is flex so it adapts
-  });
+  closeBOMSheet();
 }
 
 // ── INIT ──
 initDropdowns();
+renderBOM();
 </script>
 </body>
 </html>
